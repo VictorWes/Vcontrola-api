@@ -1,5 +1,6 @@
 package com.vcontrola.vcontrola.entity;
 
+import com.vcontrola.vcontrola.enums.TipoConta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
