@@ -1,15 +1,11 @@
+version: '3.8'
 services:
-  db:
-    image: postgres:15
+  postgres:
+    image: postgres:latest
     container_name: vcontrola-db
     environment:
-      POSTGRES_USER: vcontrola_user
-      POSTGRES_PASSWORD: vcontrola_password
-      POSTGRES_DB: vcontrola_db
+      POSTGRES_DB: vcontrola
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
-    volumes:
-      - vcontrola-data:/var/lib/postgresql/data
-
-volumes:
-  vcontrola-data:
+      - "5430:5432"
