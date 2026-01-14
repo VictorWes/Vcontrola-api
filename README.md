@@ -1,26 +1,46 @@
-# VControla
+🚀 VControla - Gestão Financeira Inteligente
+Status do Projeto: 🏗️ Em Desenvolvimento (Arquitetura de Domínio e Persistência)
 
-Status: Em produção
+📌 Sobre o Projeto
+O VControla é uma solução robusta de controle financeiro pessoal. O diferencial do projeto é a gestão inteligente de fluxo de caixa, permitindo que o usuário visualize o impacto de gastos à vista e parcelados (cartão de crédito) no seu saldo disponível em tempo real.
 
-Descrição
+O projeto segue práticas rigorosas de mercado, como Clean Architecture, Conventional Commits e separação total entre os ecossistemas de Front-end (Angular) e Back-end (Java).
 
-VControla é um projeto de gestão financeira (back-end) desenvolvido em Java/Spring Boot. A aplicação fornece uma API REST para gerenciamento de usuários, contas, cartões e transações. A API será consumida por um frontend em Angular.
+🛠️ Tecnologias e Ferramentas
+Linguagem: Java 17
 
-Principais características
+Framework: Spring Boot 3.x
 
-- Aplicação em produção
-- Autenticação e autorização via JWT
-- Containerização com Docker / docker-compose
-- Banco de dados PostgreSQL (via Docker)
-- API REST consumida por frontend Angular
+Persistência: Spring Data JPA / Hibernate
 
-Tecnologias
+Validação: Jakarta Bean Validation (Hibernate Validator)
 
-- Java 17 / Spring Boot
-- Spring Data JPA
-- Spring Security (JWT)
-- PostgreSQL
-- Docker / docker-compose
-- Maven
+Banco de Dados: PostgreSQL
 
-Projeto ainda em desenvolvimento
+Infraestrutura: Docker & Docker Compose
+
+Gerenciador de Dependências: Maven
+
+🏛️ Estrutura de Domínio (Entidades)
+A modelagem atual suporta as seguintes funcionalidades críticas:
+
+Usuários: Gerenciamento de perfil com validações de segurança.
+
+Contas: Gestão de múltiplas fontes de recurso (Corrente, Espécie, etc.).
+
+Cartões de Crédito: Controle de limite total, disponível e ciclos de fechamento/vencimento.
+
+Transações: Sistema de lançamentos com suporte a parcelamentos inteligentes (uso de transaction_group_id para vincular parcelas de uma mesma compra).
+
+📅 Roadmap de Desenvolvimento
+[x] Modelagem de Entidades (JPA)
+
+[x] Configuração de Infraestrutura Docker
+
+[ ] Implementação de Repositories e Services
+
+[ ] Implementação de DTOs e MapStruct
+
+[ ] Segurança com Spring Security e JWT
+
+[ ] Integração com Front-end Angular
