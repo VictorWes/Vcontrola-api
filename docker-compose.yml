@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15
+    container_name: vcontrola-db
+    environment:
+      POSTGRES_USER: vcontrola_user
+      POSTGRES_PASSWORD: vcontrola_password
+      POSTGRES_DB: vcontrola_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - vcontrola-data:/var/lib/postgresql/data
+
+volumes:
+  vcontrola-data:
