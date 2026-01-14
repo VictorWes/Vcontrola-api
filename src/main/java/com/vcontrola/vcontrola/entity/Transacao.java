@@ -1,5 +1,7 @@
 package com.vcontrola.vcontrola.entity;
 
+import com.vcontrola.vcontrola.enums.StatusTransacaoCartao;
+import com.vcontrola.vcontrola.enums.TipoTransacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +31,10 @@ public class Transacao {
     @NotNull(message = "O tipo de transação é obrigatório")
     @Enumerated(EnumType.STRING)
     private TipoTransacao tipo;
+
+    @NotNull(message = "O status da transação é obrigatório")
+    @Enumerated(EnumType.STRING)
+    private StatusTransacaoCartao status;
 
     @NotNull(message = "A data da transação é obrigatória")
     private LocalDate data;
