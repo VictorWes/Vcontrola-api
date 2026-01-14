@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -32,11 +33,16 @@ public class Transacao {
     @NotNull(message = "A data da transação é obrigatória")
     private LocalDate data;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cartao_credito_id") // Pode ser nulo se for gasto em conta
+    private CartaoCredito cartaoCredito;
+
     // O "RG" de família: UUID gerado no Service para agrupar parcelas
     private UUID transactionGroupId;
 
     // Ex: "1/10", "2/10"
     private String numeroParcela;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conta_id", nullable = false)
