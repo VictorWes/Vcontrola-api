@@ -1,6 +1,8 @@
 package com.vcontrola.vcontrola.controller;
 
+import com.vcontrola.vcontrola.controller.request.LoginRequest;
 import com.vcontrola.vcontrola.controller.request.UsuarioRequest;
+import com.vcontrola.vcontrola.controller.response.LoginResponse;
 import com.vcontrola.vcontrola.controller.response.UsuarioResponse;
 import com.vcontrola.vcontrola.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -32,5 +34,13 @@ public class UsuarioController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(novoUsuario);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+
+        LoginResponse response = usuarioService.autenticar(request);
+
+        return ResponseEntity.ok(response);
     }
 }
