@@ -39,7 +39,7 @@ public class SecurityConfigurations {
                         // BLOQUEAR TODO O RESTO (Privados)
                         .anyRequest().authenticated()
                 )
-                // Adiciona o nosso filtro ANTES do filtro padrão do Spring
+
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -63,13 +63,12 @@ public class SecurityConfigurations {
         return source;
     }
 
-    // Exporta o AuthenticationManager caso precisemos usar no futuro (Login automático)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // Define o algoritmo de hash de senha (BCrypt)
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
