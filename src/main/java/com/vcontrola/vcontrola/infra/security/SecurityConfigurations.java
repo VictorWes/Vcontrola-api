@@ -35,6 +35,8 @@ public class SecurityConfigurations {
                         // LIBERAR LOGIN E CADASTRO (Públicos)
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+                        // PERMITIR PREFLIGHT
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // BLOQUEAR TODO O RESTO (Privados)
                         .anyRequest().authenticated()
@@ -48,7 +50,8 @@ public class SecurityConfigurations {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        // use allowedOriginPatterns para melhor compatibilidade com versões recentes
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
 
         configuration.setAllowedMethods(Arrays.asList("*"));
 

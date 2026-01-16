@@ -8,7 +8,6 @@ import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.mapper.UsuarioMapper;
 import com.vcontrola.vcontrola.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

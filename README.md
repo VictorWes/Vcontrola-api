@@ -1,228 +1,178 @@
-# 💰 VControla - Sistema de Gestão Financeira
+# VControla - Sistema de Gestão Financeira 💰
+
+> **Status:** 🚀 Em Produção
 
 ## 📋 Sobre o Projeto
 
-Sistema de gestão financeira desenvolvido com Spring Boot e Angular, permitindo controle completo de finanças pessoais com autenticação JWT e containerização via Docker.
-
-**Status:** 🚀 **EM PRODUÇÃO**
+VControla é um sistema completo de gestão financeira desenvolvido para controle de contas, transações e cartões de crédito. O projeto oferece uma API REST robusta que será consumida por uma aplicação Angular.
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
 - **Java 17**
 - **Spring Boot 3.2.1**
-- **Spring Security** - Autenticação e autorização
-- **JWT (JSON Web Token)** - Gerenciamento de tokens de acesso
-- **Spring Data JPA** - Persistência de dados
-- **PostgreSQL** - Banco de dados relacional
+- **Spring Data JPA**
+- **Spring Security**
+- **JWT (JSON Web Token)** - Autenticação e autorização
+- **PostgreSQL** - Banco de dados
+- **Docker** - Containerização
 - **Lombok** - Redução de código boilerplate
 - **Bean Validation** - Validação de dados
 
 ### Frontend
-- **Angular** - Framework frontend
-- Comunicação via API REST
+- **Angular** - Framework frontend (em desenvolvimento)
 
-### DevOps
-- **Docker** - Containerização da aplicação
-- **Docker Compose** - Orquestração de containers
+## 🔐 Segurança
 
-## 📂 Estrutura do Projeto
-
-```
-vcontrola/
-├── src/
-│   └── main/
-│       ├── java/com/vcontrola/vcontrola/
-│       │   ├── controller/        # Endpoints da API
-│       │   ├── entity/            # Entidades JPA
-│       │   ├── repository/        # Repositórios de dados
-│       │   ├── service/           # Lógica de negócio
-│       │   ├── mapper/            # Conversão de DTOs
-│       │   ├── infra/security/    # Configurações de segurança
-│       │   └── enums/             # Enumerações
-│       └── resources/
-│           └── application.properties
-├── docker-compose.yml
-└── pom.xml
-```
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-- Java 17+
-- Maven 3.8+
-- Docker e Docker Compose
-- Node.js (para o frontend Angular)
-
-### 1. Configurar Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto (opcional):
-
-```env
-JWT_SECRET=sua-chave-secreta-super-segura-aqui
-```
-
-**Nota:** O projeto já possui um valor padrão para desenvolvimento. Para produção, é **obrigatório** definir uma chave forte.
-
-### 2. Iniciar o Banco de Dados
-
-```bash
-docker-compose up -d
-```
-
-Isso iniciará um container PostgreSQL na porta 5430.
-
-### 3. Executar a Aplicação
-
-```bash
-./mvnw spring-boot:run
-```
-
-Ou com Maven instalado:
-
-```bash
-mvn spring-boot:run
-```
-
-A API estará disponível em: `http://localhost:8080`
-
-### 4. Executar o Frontend Angular
-
-No diretório do projeto Angular:
-
-```bash
-npm install
-ng serve
-```
-
-O frontend estará disponível em: `http://localhost:4200`
-
-## 🔐 Autenticação
-
-A API utiliza JWT para autenticação. Para acessar endpoints protegidos:
-
-### 1. Cadastrar Usuário
-```http
-POST /usuarios
-Content-Type: application/json
-
-{
-  "nome": "João Silva",
-  "email": "joao@example.com",
-  "senha": "senha123456"
-}
-```
-
-### 2. Fazer Login
-```http
-POST /usuarios/login
-Content-Type: application/json
-
-{
-  "email": "joao@example.com",
-  "senha": "senha123456"
-}
-```
-
-**Resposta:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-### 3. Acessar Endpoints Protegidos
-```http
-GET /endpoint-protegido
-Authorization: Bearer {seu-token-jwt}
-```
-
-## 📡 Endpoints da API
-
-### Públicos (Sem Autenticação)
-- `POST /usuarios` - Cadastrar novo usuário
-- `POST /usuarios/login` - Fazer login
-
-### Protegidos (Requer JWT)
-- Outros endpoints requerem autenticação via token JWT
+- Autenticação via JWT
+- Senhas criptografadas com BCrypt
+- CORS configurado para integração com Angular
+- Endpoints públicos: login e cadastro
+- Endpoints privados protegidos por token
 
 ## 🐳 Docker
 
-### Subir todos os serviços
+O projeto utiliza Docker Compose para facilitar o ambiente de desenvolvimento:
+
+```yaml
+- PostgreSQL na porta 5430
+```
+
+## 📦 Pré-requisitos
+
+- Java 17 ou superior
+- Maven 3.6+
+- Docker e Docker Compose
+- Node.js e Angular CLI (para o frontend)
+
+## 🚀 Como Executar
+
+### 1. Subir o banco de dados com Docker
+
 ```bash
 docker-compose up -d
 ```
 
-### Parar os serviços
-```bash
-docker-compose down
+### 2. Compilar e executar o projeto
+
+**No PowerShell:**
+```powershell
+.\mvnw.cmd clean install
+.\mvnw.cmd spring-boot:run
 ```
 
-### Ver logs
+**No CMD ou Bash:**
 ```bash
-docker-compose logs -f
+./mvnw clean install
+./mvnw spring-boot:run
 ```
 
-## ⚙️ Configurações
+### 3. Acessar a API
+
+A API estará disponível em: `http://localhost:8080`
+
+## 🔌 Endpoints Principais
+
+### Públicos (sem autenticação)
+
+- **POST** `/usuarios` - Cadastrar novo usuário
+- **POST** `/usuarios/login` - Realizar login
+
+### Privados (requer token JWT)
+
+- Demais endpoints requerem autenticação via header `Authorization: Bearer {token}`
+
+## 📝 Configurações
 
 ### application.properties
+
 ```properties
-# Database
+# Banco de dados
 spring.datasource.url=jdbc:postgresql://localhost:5430/vcontrola
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 
-# JPA
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-# JWT
-api.security.token.secret=${JWT_SECRET:chave-padrao-dev}
+# JWT Secret
+api.security.token.secret=${JWT_SECRET:minha-chave-secreta-super-segura-vcontrola-2024}
 ```
 
-## 🔧 Resolução de Problemas
+### Variáveis de Ambiente (Opcional)
 
-### Problema: CORS Error ao conectar Angular
-**Solução:** A configuração CORS já está ativada para `http://localhost:4200`. Certifique-se de que o backend está rodando.
+- `JWT_SECRET` - Chave secreta para geração de tokens JWT
 
-### Problema: @Value("${api.security.token.secret}") não funciona
-**Solução:** Verifique se está usando Spring Boot 3.2.1 (não 4.0.1) e se o application.properties tem o valor definido.
+## 🗂️ Estrutura do Projeto
 
-### Problema: @NotBlank não valida
-**Solução:** A dependência `spring-boot-starter-validation` já está incluída. Certifique-se de usar `@Valid` nos controllers.
+```
+vcontrola/
+├── src/
+│   ├── main/
+│   │   ├── java/com/vcontrola/vcontrola/
+│   │   │   ├── controller/        # Controladores REST
+│   │   │   ├── entity/            # Entidades JPA
+│   │   │   ├── repository/        # Repositórios
+│   │   │   ├── service/           # Lógica de negócio
+│   │   │   ├── mapper/            # Conversão DTO/Entity
+│   │   │   ├── infra/security/    # Configurações de segurança
+│   │   │   └── enums/             # Enumeradores
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/                      # Testes unitários
+├── docker-compose.yml
+├── pom.xml
+└── README.md
+```
 
-### Problema: JWT_SECRET não encontrado
-**Solução:** Defina a variável de ambiente ou use o valor padrão em desenvolvimento (já configurado).
+## 🎯 Funcionalidades
 
-## 📝 Funcionalidades
-
-- ✅ Cadastro de usuários com validação
-- ✅ Autenticação via JWT
-- ✅ Controle de transações financeiras
+- ✅ Cadastro de usuários
+- ✅ Login com JWT
 - ✅ Gestão de contas bancárias
-- ✅ Gestão de cartões de crédito
-- ✅ API RESTful para integração com Angular
-- ✅ Segurança com Spring Security
-- ✅ Containerização com Docker
+- ✅ Controle de transações
+- ✅ Gerenciamento de cartões de crédito
+- ✅ Validação de dados
+- ✅ Proteção contra CORS
 
-## 🤝 Contribuindo
+## 🔧 Resolução de Problemas Comuns
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+### Erro de CORS ao conectar com Angular
+
+Certifique-se de que a configuração CORS está permitindo `http://localhost:4200`
+
+### Erro ao carregar JWT Secret
+
+Verifique se a propriedade `api.security.token.secret` está definida no `application.properties`
+
+### Erro ao executar comandos no PowerShell
+
+Use `;` ao invés de `&&` para concatenar comandos:
+
+```powershell
+cd C:\Users\pc\Documents\vcontrola; .\mvnw.cmd clean install
+```
+
+## 👨‍💻 Desenvolvimento
+
+### Compilar sem executar testes
+
+```powershell
+.\mvnw.cmd clean package -DskipTests
+```
+
+### Executar apenas os testes
+
+```powershell
+.\mvnw.cmd test
+```
 
 ## 📄 Licença
 
 Este projeto está em desenvolvimento.
 
-## 👨‍💻 Desenvolvedor
+## 🤝 Contribuindo
 
-Projeto desenvolvido para gestão financeira pessoal.
+Projeto em desenvolvimento ativo. Sugestões e melhorias são bem-vindas!
 
 ---
 
-**Versão:** 0.0.1-SNAPSHOT  
-**Última Atualização:** 2026-01-16
+**VControla** - Seu controle financeiro simplificado 💼
 
