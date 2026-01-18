@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/contas")
@@ -37,5 +38,19 @@ public class ContaController {
         List<ContaResponse> contas = service.listar(usuario.getId());
 
         return ResponseEntity.ok(contas);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody @Valid ContaRequest dados, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.atualizar(id, dados, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable UUID id, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.excluir(id, usuario);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -37,4 +37,32 @@ public class ContaService {
                 .map(mapper::toResponse)
                 .toList();
     }
+
+    public void atualizar(UUID id, ContaRequest dados, Usuario usuario) {
+        Conta conta = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+
+        if (!conta.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Você não tem permissão para alterar esta conta.");
+        }
+
+        conta.setNome(dados.nome());
+        conta.setSaldo(dados.saldo());
+        conta.setTipo(dados.tipo());
+
+        repository.save(conta);
+    }
+
+    public void excluir(UUID id, Usuario usuario) {
+        Conta conta = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+
+        if (!conta.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Você não tem permissão para excluir esta conta.");
+        }
+
+        repository.delete(conta);
+    }
+
+
 }
