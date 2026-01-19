@@ -24,9 +24,9 @@ public class ContaService {
         if (dados.saldo().doubleValue() < 0) {
             throw new IllegalArgumentException("Saldo inicial não pode ser negativo no cadastro.");
         }
-        Conta conta = mapper.toEntity(dados);
 
-        conta.setUsuario(usuario);
+        Conta conta = mapper.toEntity(dados, usuario);
+
         repository.save(conta);
     }
 
@@ -48,7 +48,8 @@ public class ContaService {
 
         conta.setNome(dados.nome());
         conta.setSaldo(dados.saldo());
-        conta.setTipo(dados.tipo());
+
+        conta.setTipo(mapper.mapTipo(dados.tipo(), usuario));
 
         repository.save(conta);
     }

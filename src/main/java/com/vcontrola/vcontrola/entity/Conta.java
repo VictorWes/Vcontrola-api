@@ -25,9 +25,9 @@ public class Conta {
     @PositiveOrZero(message = "O saldo não pode ser negativo")
     private BigDecimal saldo;
 
-    @NotNull(message = "O tipo da conta é obrigatório")
-    @Enumerated(EnumType.STRING)
-    private TipoConta tipo;
+    @ManyToOne
+    @JoinColumn(name = "tipo_conta_id")
+    private TipoContaUsuario tipo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
