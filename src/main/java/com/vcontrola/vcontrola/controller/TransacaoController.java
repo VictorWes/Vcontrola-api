@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/transacoes")
@@ -35,5 +36,19 @@ public class TransacaoController {
         var lista = service.listar(usuario);
 
         return ResponseEntity.ok(lista);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable UUID id, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.excluir(id, usuario);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody @Valid TransacaoRequest dados, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.atualizar(id, dados, usuario);
+        return ResponseEntity.ok().build();
     }
 }

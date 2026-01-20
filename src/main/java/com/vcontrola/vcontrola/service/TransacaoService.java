@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TransacaoService {
@@ -65,4 +66,41 @@ public class TransacaoService {
                 .map(mapper::toResponse)
                 .toList();
     }
+
+    @Transactional
+    public void excluir(UUID id, Usuario usuario) {
+        Transacao transacao = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        if (!transacao.getConta().getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Você não tem permissão para excluir esta transação.");
+        }
+
+
+        if (transacao.getStatus() == StatusTransacaoCartao.PAGO) {
+            Conta conta = transacao.getConta();
+
+
+            if (transacao.getTipo() == TipoTransacao.RECEITAS) {
+                conta.setSaldo(conta.getSaldo().subtract(transacao.getValor()));
+            } else if (transacao.getTipo() == TipoTransacao.GASTOS) {
+                conta.setSaldo(conta.getSaldo().add(transacao.getValor()));
+            }
+            contaRepository.save(conta);
+        }
+
+        repository.delete(transacao);
+    }
+
+    @Transactional
+    public void atualizar(UUID id, TransacaoRequest dados, Usuario usuario) {
+        this.excluir(id, usuario);
+
+
+        this.criar(dados, usuario);
+
+    }
+
+
+
 }
