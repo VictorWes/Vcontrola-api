@@ -5,9 +5,12 @@ import com.vcontrola.vcontrola.controller.response.TransacaoResponse;
 import com.vcontrola.vcontrola.entity.Conta;
 import com.vcontrola.vcontrola.entity.Transacao;
 import com.vcontrola.vcontrola.entity.Usuario;
+import com.vcontrola.vcontrola.enums.StatusTransacaoCartao;
+import com.vcontrola.vcontrola.enums.TipoTransacao;
 import com.vcontrola.vcontrola.mapper.TransacaoMapper;
 import com.vcontrola.vcontrola.repository.ContaRepository;
 import com.vcontrola.vcontrola.repository.TransacaoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +28,14 @@ public class TransacaoService {
     @Autowired
     private TransacaoMapper mapper;
 
+    @Transactional
     public void criar(TransacaoRequest dados, Usuario usuario) {
+
+        System.out.println("--- INICIANDO TRANSAÇÃO ---");
+        System.out.println("Valor recebido: " + dados.valor());
+        System.out.println("Status recebido: " + dados.status());
+        System.out.println("Tipo recebido: " + dados.tipo());
+
         Conta conta = contaRepository.findById(dados.contaId())
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
 
@@ -34,8 +44,20 @@ public class TransacaoService {
         }
 
         Transacao transacao = mapper.toEntity(dados);
-
         transacao.setConta(conta);
+
+
+        if (dados.status() == StatusTransacaoCartao.PAGO) {
+            System.out.println(">>> ENTRANDO NA ATUALIZAÇÃO DE SALDO <<<");
+            if (dados.tipo() == TipoTransacao.RECEITAS) {
+                conta.setSaldo(conta.getSaldo().add(dados.valor()));
+
+            } else if (dados.tipo() == TipoTransacao.GASTOS) {
+                conta.setSaldo(conta.getSaldo().subtract(dados.valor()));
+            }
+
+            contaRepository.save(conta);
+        }
 
         repository.save(transacao);
     }
