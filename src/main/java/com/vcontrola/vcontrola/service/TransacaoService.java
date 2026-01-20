@@ -31,10 +31,6 @@ public class TransacaoService {
     @Transactional
     public void criar(TransacaoRequest dados, Usuario usuario) {
 
-        System.out.println("--- INICIANDO TRANSAÇÃO ---");
-        System.out.println("Valor recebido: " + dados.valor());
-        System.out.println("Status recebido: " + dados.status());
-        System.out.println("Tipo recebido: " + dados.tipo());
 
         Conta conta = contaRepository.findById(dados.contaId())
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
@@ -48,7 +44,7 @@ public class TransacaoService {
 
 
         if (dados.status() == StatusTransacaoCartao.PAGO) {
-            System.out.println(">>> ENTRANDO NA ATUALIZAÇÃO DE SALDO <<<");
+
             if (dados.tipo() == TipoTransacao.RECEITAS) {
                 conta.setSaldo(conta.getSaldo().add(dados.valor()));
 
