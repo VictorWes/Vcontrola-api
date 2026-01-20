@@ -37,6 +37,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         // PERMITIR PREFLIGHT
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         // BLOQUEAR TODO O RESTO (Privados)
                         .anyRequest().authenticated()
@@ -50,15 +51,20 @@ public class SecurityConfigurations {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // use allowedOriginPatterns para melhor compatibilidade com versões recentes
+        // 1. Origens permitidas (Seu Front)
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
 
-        configuration.setAllowedMethods(Arrays.asList("*"));
+        // 2. MUDANÇA IMPORTANTE: Defina os métodos explicitamente em vez de usar "*"
+        // Isso evita problemas com Preflight (OPTIONS) em alguns navegadores
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
 
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // 3. Headers permitidos (Content-Type e Authorization são cruciais)
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token"));
 
+        // 4. Credenciais
         configuration.setAllowCredentials(true);
 
+        // 5. Expor headers de resposta se necessário
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record ContaRequest(
         @NotBlank(message = "O nome é obrigatório")
@@ -13,7 +14,7 @@ public record ContaRequest(
         @NotNull(message = "O saldo inicial é obrigatório")
         BigDecimal saldo,
 
-        @NotNull(message = "O tipo da conta é obrigatório")
-        TipoConta tipo
+        @NotNull
+        UUID tipoId
 ) {
 }

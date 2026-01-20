@@ -9,7 +9,7 @@ public record ContaResponse(
         UUID id,
         String nome,
         BigDecimal saldo,
-        TipoConta tipo
+        TipoContaResponse tipo
 ) {
 
 }
