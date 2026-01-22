@@ -56,7 +56,7 @@ public class SecurityConfigurations {
 
         // 2. MUDANÇA IMPORTANTE: Defina os métodos explicitamente em vez de usar "*"
         // Isso evita problemas com Preflight (OPTIONS) em alguns navegadores
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE", "CONNECT"));
 
         // 3. Headers permitidos (Content-Type e Authorization são cruciais)
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token"));

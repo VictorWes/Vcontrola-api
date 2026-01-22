@@ -1,178 +1,150 @@
-# VControla - Sistema de Gestão Financeira 💰
-
-> **Status:** 🚀 Em Produção
+# VControla - Sistema de Gestão Financeira
 
 ## 📋 Sobre o Projeto
 
-VControla é um sistema completo de gestão financeira desenvolvido para controle de contas, transações e cartões de crédito. O projeto oferece uma API REST robusta que será consumida por uma aplicação Angular.
+Sistema de gestão financeira desenvolvido com **Spring Boot** e **Angular**, permitindo controle completo de finanças pessoais com autenticação JWT e containerização Docker.
+
+## 🚀 Status do Projeto
+
+**✅ EM PRODUÇÃO**
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
 - **Java 17**
 - **Spring Boot 3.2.1**
+- **Spring Security** com autenticação JWT
 - **Spring Data JPA**
-- **Spring Security**
-- **JWT (JSON Web Token)** - Autenticação e autorização
-- **PostgreSQL** - Banco de dados
-- **Docker** - Containerização
-- **Lombok** - Redução de código boilerplate
-- **Bean Validation** - Validação de dados
+- **PostgreSQL**
+- **Lombok**
+- **Bean Validation**
 
 ### Frontend
-- **Angular** - Framework frontend (em desenvolvimento)
+- **Angular**
+- Consumindo API REST
 
-## 🔐 Segurança
+### DevOps
+- **Docker & Docker Compose**
+- **Maven**
 
-- Autenticação via JWT
-- Senhas criptografadas com BCrypt
-- CORS configurado para integração com Angular
-- Endpoints públicos: login e cadastro
-- Endpoints privados protegidos por token
+## 📦 Funcionalidades
 
-## 🐳 Docker
+- ✅ Autenticação e Autorização com JWT
+- ✅ Gestão de Usuários
+- ✅ Controle de Contas Financeiras
+- ✅ Gestão de Transações
+- ✅ Planejamento Financeiro
+- ✅ Controle de Cartões de Crédito
+- ✅ Dashboard de Resumo Financeiro
 
-O projeto utiliza Docker Compose para facilitar o ambiente de desenvolvimento:
+## 🔧 Pré-requisitos
 
-```yaml
-- PostgreSQL na porta 5430
-```
-
-## 📦 Pré-requisitos
-
-- Java 17 ou superior
-- Maven 3.6+
+- Java 17+
 - Docker e Docker Compose
-- Node.js e Angular CLI (para o frontend)
+- Maven
+- Node.js e npm (para o frontend Angular)
 
 ## 🚀 Como Executar
 
-### 1. Subir o banco de dados com Docker
+### 1. Clone o repositório
+```bash
+git clone <seu-repositorio>
+cd vcontrola
+```
 
+### 2. Configurar variáveis de ambiente
+
+Crie um arquivo `.env` ou configure a variável de ambiente:
+```bash
+JWT_SECRET=sua-chave-secreta-aqui
+```
+
+Ou edite o `application.properties` para usar o valor padrão (não recomendado para produção).
+
+### 3. Subir o banco de dados com Docker
 ```bash
 docker-compose up -d
 ```
 
-### 2. Compilar e executar o projeto
-
-**No PowerShell:**
-```powershell
-.\mvnw.cmd clean install
+### 4. Executar a aplicação
+```bash
 .\mvnw.cmd spring-boot:run
 ```
 
-**No CMD ou Bash:**
+Ou compile e execute:
 ```bash
-./mvnw clean install
-./mvnw spring-boot:run
+.\mvnw.cmd clean package -DskipTests
+java -jar target/vcontrola-0.0.1-SNAPSHOT.jar
 ```
 
-### 3. Acessar a API
+### 5. Executar o frontend Angular
+```bash
+cd frontend
+npm install
+ng serve
+```
 
-A API estará disponível em: `http://localhost:8080`
+Acesse: `http://localhost:4200`
 
-## 🔌 Endpoints Principais
+## 🔐 Segurança
+
+- Autenticação via **JWT (JSON Web Token)**
+- Senhas criptografadas com **BCrypt**
+- CORS configurado para permitir apenas origens confiáveis
+- Proteção contra CSRF desabilitada (API Stateless)
+
+## 📊 Banco de Dados
+
+O projeto utiliza **PostgreSQL** rodando em Docker na porta **5430**.
+
+### Configuração padrão:
+- **Host:** localhost
+- **Porta:** 5430
+- **Database:** vcontrola
+- **Usuário:** postgres
+- **Senha:** postgres
+
+## 📝 Endpoints da API
 
 ### Públicos (sem autenticação)
+- `POST /usuarios/login` - Login de usuário
+- `POST /usuarios` - Cadastro de novo usuário
 
-- **POST** `/usuarios` - Cadastrar novo usuário
-- **POST** `/usuarios/login` - Realizar login
+### Privados (requer JWT)
+- `GET/POST/PUT/DELETE /contas` - Gestão de contas
+- `GET/POST/PUT/DELETE /transacoes` - Gestão de transações
+- `GET/POST /planejamento` - Planejamento financeiro
+- `GET /dashboard` - Resumo financeiro
 
-### Privados (requer token JWT)
+## 🐳 Docker
 
-- Demais endpoints requerem autenticação via header `Authorization: Bearer {token}`
+O projeto possui configuração Docker Compose para subir o banco PostgreSQL:
 
-## 📝 Configurações
-
-### application.properties
-
-```properties
-# Banco de dados
-spring.datasource.url=jdbc:postgresql://localhost:5430/vcontrola
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-
-# JWT Secret
-api.security.token.secret=${JWT_SECRET:minha-chave-secreta-super-segura-vcontrola-2024}
+```bash
+docker-compose up -d    # Subir serviços
+docker-compose down     # Parar serviços
+docker-compose logs     # Ver logs
 ```
 
-### Variáveis de Ambiente (Opcional)
+## 🧪 Testes
 
-- `JWT_SECRET` - Chave secreta para geração de tokens JWT
-
-## 🗂️ Estrutura do Projeto
-
-```
-vcontrola/
-├── src/
-│   ├── main/
-│   │   ├── java/com/vcontrola/vcontrola/
-│   │   │   ├── controller/        # Controladores REST
-│   │   │   ├── entity/            # Entidades JPA
-│   │   │   ├── repository/        # Repositórios
-│   │   │   ├── service/           # Lógica de negócio
-│   │   │   ├── mapper/            # Conversão DTO/Entity
-│   │   │   ├── infra/security/    # Configurações de segurança
-│   │   │   └── enums/             # Enumeradores
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/                      # Testes unitários
-├── docker-compose.yml
-├── pom.xml
-└── README.md
-```
-
-## 🎯 Funcionalidades
-
-- ✅ Cadastro de usuários
-- ✅ Login com JWT
-- ✅ Gestão de contas bancárias
-- ✅ Controle de transações
-- ✅ Gerenciamento de cartões de crédito
-- ✅ Validação de dados
-- ✅ Proteção contra CORS
-
-## 🔧 Resolução de Problemas Comuns
-
-### Erro de CORS ao conectar com Angular
-
-Certifique-se de que a configuração CORS está permitindo `http://localhost:4200`
-
-### Erro ao carregar JWT Secret
-
-Verifique se a propriedade `api.security.token.secret` está definida no `application.properties`
-
-### Erro ao executar comandos no PowerShell
-
-Use `;` ao invés de `&&` para concatenar comandos:
-
-```powershell
-cd C:\Users\pc\Documents\vcontrola; .\mvnw.cmd clean install
-```
-
-## 👨‍💻 Desenvolvimento
-
-### Compilar sem executar testes
-
-```powershell
-.\mvnw.cmd clean package -DskipTests
-```
-
-### Executar apenas os testes
-
-```powershell
+```bash
 .\mvnw.cmd test
 ```
 
 ## 📄 Licença
 
-Este projeto está em desenvolvimento.
+Este projeto está sob licença MIT.
 
-## 🤝 Contribuindo
+## 👨‍💻 Autor
 
-Projeto em desenvolvimento ativo. Sugestões e melhorias são bem-vindas!
+Desenvolvido para controle financeiro pessoal.
 
 ---
 
-**VControla** - Seu controle financeiro simplificado 💼
+**⚠️ Observações de Segurança:**
+- Altere a chave JWT_SECRET em produção
+- Configure CORS apenas para domínios confiáveis
+- Use HTTPS em produção
+- Nunca commite senhas ou chaves no repositório
 
