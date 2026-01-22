@@ -6,7 +6,6 @@ import com.vcontrola.vcontrola.controller.response.ResumoFinanceiroResponse;
 import com.vcontrola.vcontrola.entity.*;
 import com.vcontrola.vcontrola.enums.StatusPlanejamento;
 import com.vcontrola.vcontrola.enums.StatusTransacaoCartao;
-import com.vcontrola.vcontrola.enums.TipoConta;
 import com.vcontrola.vcontrola.enums.TipoTransacao;
 import com.vcontrola.vcontrola.mapper.FinanceiroMapper;
 import com.vcontrola.vcontrola.repository.*;
@@ -25,10 +24,7 @@ public class FinanceiroService {
     @Autowired private ControleFinanceiroRepository controleRepo;
     @Autowired private ItemPlanejamentoRepository itemRepo;
     @Autowired private ContaRepository contaRepo;
-
-    @Autowired
-    private TipoContaUsuarioRepository tipoContaUsuarioRepo;
-
+    @Autowired private TipoContaUsuarioRepository tipoContaUsuarioRepo;
     @Autowired private TransacaoService transacaoService;
     @Autowired private FinanceiroMapper mapper;
 
@@ -59,6 +55,52 @@ public class FinanceiroService {
         itemRepo.save(item);
     }
 
+
+    @Transactional
+    public void atualizarItem(UUID id, ItemPlanejamentoRequest dados, Usuario usuario) {
+        ItemPlanejamento item = itemRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        if (!item.getControle().getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado");
+        }
+
+
+        if (item.getStatus() == StatusPlanejamento.GUARDADO) {
+            throw new RuntimeException("Desbloqueie o item (cadeado) antes de editar.");
+        }
+
+
+        Conta novaConta = contaRepo.findById(dados.contaDestinoId())
+                .orElseThrow(() -> new RuntimeException("Conta destino não encontrada"));
+
+        TipoContaUsuario novaCarteira = tipoContaUsuarioRepo.findById(dados.carteiraId())
+                .orElseThrow(() -> new RuntimeException("Carteira não encontrada"));
+
+        item.setValor(dados.valor());
+        item.setContaDestino(novaConta);
+        item.setCarteira(novaCarteira);
+
+        itemRepo.save(item);
+    }
+
+
+    @Transactional
+    public void excluirItem(UUID id, Usuario usuario) {
+        ItemPlanejamento item = itemRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        if (!item.getControle().getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado");
+        }
+
+        if (item.getStatus() == StatusPlanejamento.GUARDADO) {
+            throw new RuntimeException("Desbloqueie o item (cadeado) antes de excluir para estornar o valor.");
+        }
+
+        itemRepo.delete(item);
+    }
+
     @Transactional
     public void alternarStatus(UUID itemId, Usuario usuario) {
         ItemPlanejamento item = itemRepo.findById(itemId).orElseThrow();
@@ -76,7 +118,7 @@ public class FinanceiroService {
             controle.setSaldoDisponivel(controle.getSaldoDisponivel().subtract(item.getValor()));
 
             TransacaoRequest deposito = new TransacaoRequest(
-                    "Reserva: " + item.getCarteira().getNome(), // Aqui usa o nome da carteira
+                    "Reserva: " + item.getCarteira().getNome(),
                     item.getValor(),
                     TipoTransacao.RECEITAS,
                     StatusTransacaoCartao.PAGO,

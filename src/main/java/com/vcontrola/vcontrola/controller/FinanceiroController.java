@@ -16,9 +16,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/financeiro")
 public class FinanceiroController {
+
     @Autowired
     private FinanceiroService service;
-
 
     @GetMapping
     public ResponseEntity<ResumoFinanceiroResponse> buscarResumo(Authentication auth) {
@@ -27,14 +27,12 @@ public class FinanceiroController {
         return ResponseEntity.ok(resumo);
     }
 
-
     @PostMapping("/saldo")
     public ResponseEntity<Void> adicionarSaldo(@RequestBody @Valid SaldoVirtualRequest request, Authentication auth) {
         Usuario usuario = (Usuario) auth.getPrincipal();
         service.adicionarSaldoVirtual(request.valor(), usuario);
         return ResponseEntity.ok().build();
     }
-
 
     @PostMapping("/item")
     public ResponseEntity<Void> criarItem(@RequestBody @Valid ItemPlanejamentoRequest request, Authentication auth) {
@@ -43,6 +41,21 @@ public class FinanceiroController {
         return ResponseEntity.ok().build();
     }
 
+
+    @PutMapping("/item/{id}")
+    public ResponseEntity<Void> atualizarItem(@PathVariable UUID id, @RequestBody @Valid ItemPlanejamentoRequest request, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.atualizarItem(id, request, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @DeleteMapping("/item/{id}")
+    public ResponseEntity<Void> excluirItem(@PathVariable UUID id, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.excluirItem(id, usuario);
+        return ResponseEntity.noContent().build();
+    }
 
     @PatchMapping("/item/{id}/alternar")
     public ResponseEntity<Void> alternarStatus(@PathVariable UUID id, Authentication auth) {
