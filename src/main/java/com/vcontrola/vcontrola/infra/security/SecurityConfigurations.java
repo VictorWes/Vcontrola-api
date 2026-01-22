@@ -28,18 +28,18 @@ public class SecurityConfigurations {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita CORS
-                .csrf(csrf -> csrf.disable()) // Desabilita proteção contra ataques de formulário (não necessário em API REST)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Não guarda estado (JWT é stateless)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // LIBERAR LOGIN E CADASTRO (Públicos)
+
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        // PERMITIR PREFLIGHT
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // BLOQUEAR TODO O RESTO (Privados)
+
                         .anyRequest().authenticated()
                 )
 
@@ -51,20 +51,19 @@ public class SecurityConfigurations {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 1. Origens permitidas (Seu Front)
+
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
 
-        // 2. MUDANÇA IMPORTANTE: Defina os métodos explicitamente em vez de usar "*"
-        // Isso evita problemas com Preflight (OPTIONS) em alguns navegadores
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
 
-        // 3. Headers permitidos (Content-Type e Authorization são cruciais)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE", "CONNECT"));
+
+
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token"));
 
-        // 4. Credenciais
+
         configuration.setAllowCredentials(true);
 
-        // 5. Expor headers de resposta se necessário
+
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
