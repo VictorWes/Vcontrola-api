@@ -1,6 +1,7 @@
 package com.vcontrola.vcontrola.controller;
 
 import com.vcontrola.vcontrola.controller.request.ItemPlanejamentoRequest;
+import com.vcontrola.vcontrola.controller.request.ResgateRequest;
 import com.vcontrola.vcontrola.controller.request.SaldoVirtualRequest;
 import com.vcontrola.vcontrola.controller.response.ResumoFinanceiroResponse;
 import com.vcontrola.vcontrola.entity.Usuario;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -61,6 +63,18 @@ public class FinanceiroController {
     public ResponseEntity<Void> alternarStatus(@PathVariable UUID id, Authentication auth) {
         Usuario usuario = (Usuario) auth.getPrincipal();
         service.alternarStatus(id, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/item/{id}/resgatar")
+    public ResponseEntity<Void> resgatarParcial(
+            @PathVariable UUID id,
+            @RequestBody @Valid ResgateRequest request,
+            Authentication auth
+    ) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        service.resgatarParcial(id, request.valor(), usuario);
+
         return ResponseEntity.ok().build();
     }
 }

@@ -161,4 +161,50 @@ public class FinanceiroService {
                     return controleRepo.save(novo);
                 });
     }
+
+    @Transactional
+    public void resgatarParcial(UUID itemId, BigDecimal valorResgate, Usuario usuario) {
+        ItemPlanejamento item = itemRepo.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        if (!item.getControle().getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado");
+        }
+
+        if (item.getStatus() != StatusPlanejamento.GUARDADO) {
+            throw new RuntimeException("Apenas itens guardados podem ter resgate parcial.");
+        }
+
+        if (valorResgate.compareTo(item.getValor()) > 0) {
+            throw new RuntimeException("O valor do resgate não pode ser maior que o valor guardado.");
+        }
+
+        ControleFinanceiro controle = item.getControle();
+
+
+        item.setValor(item.getValor().subtract(valorResgate));
+
+
+        controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(valorResgate));
+
+
+        TransacaoRequest saque = new TransacaoRequest(
+                "Resgate Parcial: " + item.getCarteira().getNome(),
+                valorResgate,
+                TipoTransacao.GASTOS,
+                StatusTransacaoCartao.PAGO,
+                LocalDate.now(),
+                item.getContaDestino().getId(),
+                null, null
+        );
+        transacaoService.criar(saque, usuario);
+
+
+        if (item.getValor().compareTo(BigDecimal.ZERO) == 0) {
+            item.setStatus(StatusPlanejamento.PENDENTE);
+        }
+
+        itemRepo.save(item);
+        controleRepo.save(controle);
+    }
 }
