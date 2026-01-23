@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface ItemPlanejamentoRepository extends JpaRepository<ItemPlanejamento, UUID> {
     List<ItemPlanejamento> findByControleId(UUID controleId);
     boolean existsByContaDestinoId(UUID contaId);
+    boolean existsByCarteiraId(UUID carteiraId);
 }
