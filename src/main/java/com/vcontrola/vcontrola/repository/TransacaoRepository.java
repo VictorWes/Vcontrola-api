@@ -15,9 +15,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
     List<Transacao> findByContaIdAndDataBetween(UUID contaId, LocalDate inicio, LocalDate fim);
 
-
     List<Transacao> findByTransactionGroupId(UUID transactionGroupId);
-
 
     List<Transacao> findByStatus(StatusTransacaoCartao status);
 
@@ -25,4 +23,6 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
     @Query("SELECT t FROM Transacao t WHERE t.conta.usuario.id = :usuarioId ORDER BY t.data DESC")
     List<Transacao> findAllByUsuarioId(UUID usuarioId);
+
+    boolean existsByContaId(UUID contaId);
 }
