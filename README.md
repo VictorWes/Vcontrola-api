@@ -124,10 +124,10 @@ vcontrola/
 - [x] Exclusão de transações
 
 ### ✅ Cartões de Crédito
-- [x] Cadastro de cartões
-- [x] Acompanhamento de faturas
-- [x] Status de transações do cartão
-- [x] Controle de limite
+- [] Cadastro de cartões
+- [] Acompanhamento de faturas
+- [] Status de transações do cartão
+- [] Controle de limite
 
 ### ✅ Dashboard e Relatórios
 - [x] Resumo financeiro
