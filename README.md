@@ -1,10 +1,16 @@
 # VControla - Sistema de Gestão Financeira 💰
 
-> **Status:** 🚀 Em Produção
+> **Status:** 🚀 **EM PRODUÇÃO**
+
+## 🌐 Acesso ao Sistema
+
+**🔗 Aplicação em Produção:** [https://vcontrola.vercel.app/auth/login](https://vcontrola.vercel.app/auth/login)
+
+> ⚠️ **Importante:** A aplicação já está disponível para testes! Acesse o link acima para criar sua conta e começar a usar.
 
 ## 📋 Sobre o Projeto
 
-VControla é um sistema completo de gestão financeira desenvolvido para controle de contas, transações e cartões de crédito. O projeto oferece uma API REST robusta que será consumida por uma aplicação Angular.
+VControla é um sistema completo de gestão financeira desenvolvido para controle de contas, transações e cartões de crédito. O projeto oferece uma API REST robusta integrada com uma aplicação Angular moderna e responsiva.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -17,88 +23,40 @@ VControla é um sistema completo de gestão financeira desenvolvido para control
 - **PostgreSQL** - Banco de dados
 - **Docker** - Containerização
 - **Lombok** - Redução de código boilerplate
-- **Bean Validation** - Validação de dados
+- **Bean Validation** - Validação de dados (@NotBlank, @NotNull, etc)
 
 ### Frontend
-- **Angular** - Framework frontend (em desenvolvimento)
+- **Angular 17+** - Framework frontend
+- **TypeScript** - Linguagem principal
+- **RxJS** - Programação reativa
+- **Angular Router** - Navegação
+- **HttpClient** - Comunicação com API
+- **Vercel** - Deploy e hospedagem
+
+### DevOps & Deploy
+- **Vercel** - Hospedagem do frontend
+- **Docker Compose** - Orquestração de containers
+- **GitHub** - Controle de versão
 
 ## 🔐 Segurança
 
-- Autenticação via JWT
-- Senhas criptografadas com BCrypt
-- CORS configurado para integração com Angular
-- Endpoints públicos: login e cadastro
-- Endpoints privados protegidos por token
+- ✅ Autenticação via JWT
+- ✅ Senhas criptografadas com BCrypt
+- ✅ CORS configurado para integração com Angular
+- ✅ Endpoints públicos: login e cadastro
+- ✅ Endpoints privados protegidos por token
+- ✅ Configuração de segurança com Spring Security
+- ✅ CSRF desabilitado para API REST
 
 ## 🐳 Docker
 
 O projeto utiliza Docker Compose para facilitar o ambiente de desenvolvimento:
 
-```yaml
-- PostgreSQL na porta 5430
-```
 
-## 📦 Pré-requisitos
+### Para Testar em Produção
 
-- Java 17 ou superior
-- Maven 3.6+
-- Docker e Docker Compose
-- Node.js e Angular CLI (para o frontend)
-
-## 🚀 Como Executar
-
-### 1. Subir o banco de dados com Docker
-
-```bash
-docker-compose up -d
-```
-
-### 2. Compilar e executar o projeto
-
-**No PowerShell:**
-```powershell
-.\mvnw.cmd clean install
-.\mvnw.cmd spring-boot:run
-```
-
-**No CMD ou Bash:**
-```bash
-./mvnw clean install
-./mvnw spring-boot:run
-```
-
-### 3. Acessar a API
-
-A API estará disponível em: `http://localhost:8080`
-
-## 🔌 Endpoints Principais
-
-### Públicos (sem autenticação)
-
-- **POST** `/usuarios` - Cadastrar novo usuário
-- **POST** `/usuarios/login` - Realizar login
-
-### Privados (requer token JWT)
-
-- Demais endpoints requerem autenticação via header `Authorization: Bearer {token}`
-
-## 📝 Configurações
-
-### application.properties
-
-```properties
-# Banco de dados
-spring.datasource.url=jdbc:postgresql://localhost:5430/vcontrola
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-
-# JWT Secret
-api.security.token.secret=${JWT_SECRET:minha-chave-secreta-super-segura-vcontrola-2024}
-```
-
-### Variáveis de Ambiente (Opcional)
-
-- `JWT_SECRET` - Chave secreta para geração de tokens JWT
+- Apenas um navegador web moderno
+- Acesse: [https://vcontrola.vercel.app/auth/login](https://vcontrola.vercel.app/auth/login)
 
 ## 🗂️ Estrutura do Projeto
 
@@ -107,72 +65,125 @@ vcontrola/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/vcontrola/vcontrola/
-│   │   │   ├── controller/        # Controladores REST
-│   │   │   ├── entity/            # Entidades JPA
-│   │   │   ├── repository/        # Repositórios
-│   │   │   ├── service/           # Lógica de negócio
-│   │   │   ├── mapper/            # Conversão DTO/Entity
-│   │   │   ├── infra/security/    # Configurações de segurança
-│   │   │   └── enums/             # Enumeradores
+│   │   │   ├── controller/           # Controladores REST
+│   │   │   │   ├── request/          # DTOs de requisição
+│   │   │   │   └── response/         # DTOs de resposta
+│   │   │   ├── entity/               # Entidades JPA
+│   │   │   │   ├── Usuario.java
+│   │   │   │   ├── Conta.java
+│   │   │   │   ├── Transacao.java
+│   │   │   │   ├── CartaoCredito.java
+│   │   │   │   ├── ControleFinanceiro.java
+│   │   │   │   ├── ItemPlanejamento.java
+│   │   │   │   └── TipoContaUsuario.java
+│   │   │   ├── repository/           # Repositórios JPA
+│   │   │   ├── service/              # Lógica de negócio
+│   │   │   ├── mapper/               # Conversão DTO/Entity
+│   │   │   ├── infra/security/       # Configurações de segurança
+│   │   │   │   ├── SecurityConfigurations.java
+│   │   │   │   ├── SecurityFilter.java
+│   │   │   │   └── TokenService.java
+│   │   │   └── enums/                # Enumeradores
+│   │   │       ├── TipoConta.java
+│   │   │       ├── TipoTransacao.java
+│   │   │       ├── StatusTransacaoCartao.java
+│   │   │       └── StatusPlanejamento.java
 │   │   └── resources/
 │   │       └── application.properties
-│   └── test/                      # Testes unitários
+│   └── test/                         # Testes unitários
 ├── docker-compose.yml
+├── Dockerfile
 ├── pom.xml
 └── README.md
 ```
 
-## 🎯 Funcionalidades
+## 🎯 Funcionalidades Implementadas
 
-- ✅ Cadastro de usuários
-- ✅ Login com JWT
-- ✅ Gestão de contas bancárias
-- ✅ Controle de transações
-- ✅ Gerenciamento de cartões de crédito
-- ✅ Validação de dados
-- ✅ Proteção contra CORS
+### ✅ Autenticação e Autorização
+- [x] Cadastro de usuários
+- [x] Login com JWT
+- [x] Proteção de rotas
+- [x] Renovação de token
+- [x] Logout
 
-## 🔧 Resolução de Problemas Comuns
+### ✅ Gestão de Contas
+- [x] Criar conta bancária
+- [x] Listar contas
+- [x] Editar conta
+- [x] Excluir conta
+- [x] Visualizar saldo
+- [x] Tipos de conta personalizados
 
-### Erro de CORS ao conectar com Angular
+### ✅ Controle de Transações
+- [x] Registrar receitas
+- [x] Registrar despesas
+- [x] Histórico de transações
+- [x] Filtros por data/tipo
+- [x] Categorização
+- [x] Edição de transações
+- [x] Exclusão de transações
 
-Certifique-se de que a configuração CORS está permitindo `http://localhost:4200`
+### ✅ Cartões de Crédito
+- [x] Cadastro de cartões
+- [x] Acompanhamento de faturas
+- [x] Status de transações do cartão
+- [x] Controle de limite
 
-### Erro ao carregar JWT Secret
+### ✅ Dashboard e Relatórios
+- [x] Resumo financeiro
+- [x] Gráficos de receitas e despesas
+- [x] Saldo consolidado
+- [x] Análise por período
 
-Verifique se a propriedade `api.security.token.secret` está definida no `application.properties`
+### ✅ Planejamento Financeiro
+- [x] Criar metas financeiras
+- [x] Acompanhar progresso
+- [x] Controle de orçamento
+- [x] Status de planejamento
 
-### Erro ao executar comandos no PowerShell
+### ✅ Validações
+- [x] Validação de dados com Bean Validation
+- [x] @NotBlank em campos obrigatórios
+- [x] @NotNull em campos não nulos
+- [x] Mensagens de erro personalizadas
+- [x] Tratamento de exceções
 
-Use `;` ao invés de `&&` para concatenar comandos:
 
-```powershell
-cd C:\Users\pc\Documents\vcontrola; .\mvnw.cmd clean install
-```
+## 🧪 Testando a Aplicação
 
-## 👨‍💻 Desenvolvimento
+### 1. Acesse a aplicação em produção
+[https://vcontrola.vercel.app/auth/login](https://vcontrola.vercel.app/auth/login)
 
-### Compilar sem executar testes
+### 2. Crie sua conta
+- Clique em "Cadastrar"
+- Preencha seus dados
+- Faça login
 
-```powershell
-.\mvnw.cmd clean package -DskipTests
-```
+### 3. Explore as funcionalidades
+- Crie suas contas bancárias
+- Registre transações
+- Visualize o dashboard
+- Configure seu planejamento financeiro
 
-### Executar apenas os testes
+## 📊 Roadmap
 
-```powershell
-.\mvnw.cmd test
-```
+### Em Desenvolvimento
+- [ ] Notificações por email
+- [ ] Backup automático
+- [ ] Modo escuro
+
+### Futuras Implementações
+- [ ] Relatórios em PDF
 
 ## 📄 Licença
 
-Este projeto está em desenvolvimento.
+Este projeto está em desenvolvimento ativo.
 
 ## 🤝 Contribuindo
 
 Projeto em desenvolvimento ativo. Sugestões e melhorias são bem-vindas!
 
----
 
 **VControla** - Seu controle financeiro simplificado 💼
 
+🚀 **[Teste agora em produção!](https://vcontrola.vercel.app/auth/login)**
