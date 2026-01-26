@@ -130,16 +130,16 @@ vcontrola/
 - [] Controle de limite
 
 ### ✅ Dashboard e Relatórios
-- [x] Resumo financeiro
-- [x] Gráficos de receitas e despesas
-- [x] Saldo consolidado
-- [x] Análise por período
+- [] Resumo financeiro
+- [] Gráficos de receitas e despesas
+- [] Saldo consolidado
+- [] Análise por período
 
 ### ✅ Planejamento Financeiro
-- [x] Criar metas financeiras
-- [x] Acompanhar progresso
-- [x] Controle de orçamento
-- [x] Status de planejamento
+- [] Criar metas financeiras
+- [] Acompanhar progresso
+- [] Controle de orçamento
+- [] Status de planejamento
 
 ### ✅ Validações
 - [x] Validação de dados com Bean Validation
