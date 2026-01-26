@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.vcontrola.vcontrola.controller.response.LoginResponse;
 import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class GoogleLogService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String autenticarGoogle(String tokenGoogle) throws GeneralSecurityException, IOException {
+    public LoginResponse autenticarGoogle(String tokenGoogle) throws GeneralSecurityException, IOException {
+
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(CLIENT_ID))
@@ -55,13 +57,15 @@ public class GoogleLogService {
             usuario = new Usuario();
             usuario.setNome(nome);
             usuario.setEmail(email);
-
             usuario.setSenha(passwordEncoder.encode("GOOGLE_AUTH_" + java.util.UUID.randomUUID().toString()));
 
             repository.save(usuario);
         }
 
 
-        return tokenService.gerarToken(usuario);
+        String tokenJwt = tokenService.gerarToken(usuario);
+
+
+        return new LoginResponse(tokenJwt, usuario.getNome());
     }
 }

@@ -49,14 +49,14 @@ public class UsuarioController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity loginGoogle(@RequestBody GoogleLoginRequest dados) {
+    public ResponseEntity loginGoogle(@RequestBody GoogleLoginRequest request) {
         try {
-            String tokenJwt = googleLogService.autenticarGoogle(dados.token());
+            LoginResponse response = googleLogService.autenticarGoogle(request.token());
 
-            // Retornamos no mesmo formato que o Login normal retorna
-            return ResponseEntity.ok(new LoginResponse(tokenJwt, "Login Google com sucesso"));
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao autenticar com Google: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }
