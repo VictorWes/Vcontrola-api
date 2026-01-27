@@ -6,10 +6,13 @@ import com.vcontrola.vcontrola.entity.CartaoCredito;
 import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.mapper.CartaoCreditoMapper;
 import com.vcontrola.vcontrola.repository.CartaoCreditoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CartaoCreditoService {
@@ -30,5 +33,37 @@ public class CartaoCreditoService {
         return cartoes.stream()
                 .map(mapper::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public void atualizar(UUID id, CartaoRequest request, Usuario usuario) {
+        CartaoCredito cartao = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
+
+        if (!cartao.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado a este cartão");
+        }
+
+        if (request.limite().compareTo(cartao.getLimiteTotal()) != 0) {
+            BigDecimal diferenca = request.limite().subtract(cartao.getLimiteTotal());
+            cartao.setLimiteTotal(request.limite());
+            cartao.setLimiteDisponivel(cartao.getLimiteDisponivel().add(diferenca));
+        }
+
+        mapper.updateEntity(cartao, request);
+
+        repository.save(cartao);
+    }
+
+    @Transactional
+    public void excluir(UUID id, Usuario usuario) {
+        CartaoCredito cartao = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
+
+        if (!cartao.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado a este cartão");
+        }
+
+        repository.delete(cartao);
     }
 }

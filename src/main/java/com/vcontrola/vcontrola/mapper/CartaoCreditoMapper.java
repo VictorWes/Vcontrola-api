@@ -31,4 +31,11 @@ public class CartaoCreditoMapper {
                 BigDecimal.ZERO
         );
     }
+
+    public void updateEntity(CartaoCredito target, CartaoRequest source) {
+        target.setNome(source.nome());
+        target.setDiaVencimento(source.diaVencimento());
+        target.setDiaFechamento(source.diaFechamento());
+
+    }
 }

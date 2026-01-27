@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/cartoes")
@@ -39,5 +40,32 @@ public class CartaoController {
         List<CartaoResponse> response = service.listar(usuario);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(
+            @PathVariable UUID id,
+            @RequestBody CartaoRequest request,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        service.atualizar(id, request, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        service.excluir(id, usuario);
+
+        return ResponseEntity.noContent().build();
     }
 }
