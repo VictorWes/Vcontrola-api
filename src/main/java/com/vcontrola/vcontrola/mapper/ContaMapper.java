@@ -14,7 +14,6 @@ public class ContaMapper {
     private final TipoContaUsuarioRepository tipoRepo;
     private final TipoContaMapper tipoContaMapper;
 
-
     public ContaMapper(TipoContaUsuarioRepository tipoRepo, TipoContaMapper tipoContaMapper) {
         this.tipoRepo = tipoRepo;
         this.tipoContaMapper = tipoContaMapper;
@@ -28,15 +27,15 @@ public class ContaMapper {
 
 
         if (request.tipoId() != null) {
+
             TipoContaUsuario tipo = tipoRepo.findById(request.tipoId())
                     .orElseThrow(() -> new RuntimeException("Tipo de conta não encontrado com o ID: " + request.tipoId()));
 
             conta.setTipo(tipo);
         } else {
 
-            throw new IllegalArgumentException("O campo 'tipoId' é obrigatório.");
+            conta.setTipo(null);
         }
-
 
         return conta;
     }
@@ -46,7 +45,6 @@ public class ContaMapper {
                 conta.getId(),
                 conta.getNome(),
                 conta.getSaldo(),
-
                 conta.getTipo() != null ? tipoContaMapper.toResponse(conta.getTipo()) : null
         );
     }

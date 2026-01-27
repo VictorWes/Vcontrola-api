@@ -14,7 +14,7 @@ public record ContaRequest(
         @NotNull(message = "O saldo inicial é obrigatório")
         BigDecimal saldo,
 
-        @NotNull
+
         UUID tipoId
 ) {
 }
