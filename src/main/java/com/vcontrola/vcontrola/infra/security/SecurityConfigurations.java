@@ -31,17 +31,32 @@ public class SecurityConfigurations {
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+
                 .csrf(csrf -> csrf.disable())
+
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+
                 .authorizeHttpRequests(authorize -> authorize
 
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios/google").permitAll()
+
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+
+                        .requestMatchers("/cartoes", "/cartoes/**").permitAll()
+                        .requestMatchers("/dashboard", "/dashboard/**").authenticated()
+                        .requestMatchers("/planejamento", "/planejamento/**").authenticated()
+
+
                         .anyRequest().authenticated()
                 )
+                // 5. Adiciona o filtro de Token
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -51,17 +66,13 @@ public class SecurityConfigurations {
         CorsConfiguration configuration = new CorsConfiguration();
 
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "https://vcontrola.com.br", "*"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE", "CONNECT"));
-
-
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token"));
 
 
         configuration.setAllowCredentials(true);
-
 
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
@@ -74,7 +85,6 @@ public class SecurityConfigurations {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

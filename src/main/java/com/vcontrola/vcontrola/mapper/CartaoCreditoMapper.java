@@ -14,6 +14,7 @@ public class CartaoCreditoMapper {
         CartaoCredito cartao = new CartaoCredito();
         cartao.setNome(request.nome());
         cartao.setLimiteTotal(request.limite());
+        cartao.setLimiteDisponivel(request.limite());
         cartao.setDiaVencimento(request.diaVencimento());
         cartao.setDiaFechamento(request.diaFechamento());
         cartao.setUsuario(usuario);
