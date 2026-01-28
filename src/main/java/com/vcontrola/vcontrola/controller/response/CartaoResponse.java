@@ -6,7 +6,8 @@ import java.util.UUID;
 public record CartaoResponse(
         UUID id,
         String nome,
-        BigDecimal limite,
+        BigDecimal limiteTotal,
+        BigDecimal limiteDisponivel,
         Integer diaVencimento,
         Integer diaFechamento,
         BigDecimal valorFaturaAtual

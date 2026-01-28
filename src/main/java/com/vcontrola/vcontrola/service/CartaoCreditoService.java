@@ -6,11 +6,13 @@ import com.vcontrola.vcontrola.entity.CartaoCredito;
 import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.mapper.CartaoCreditoMapper;
 import com.vcontrola.vcontrola.repository.CartaoCreditoRepository;
+import com.vcontrola.vcontrola.repository.ParcelaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +20,9 @@ import java.util.UUID;
 public class CartaoCreditoService {
     @Autowired
     private CartaoCreditoRepository repository;
+
+    @Autowired
+    private ParcelaRepository parcelaRepository;
 
     @Autowired
     private CartaoCreditoMapper mapper;
@@ -31,7 +36,28 @@ public class CartaoCreditoService {
         List<CartaoCredito> cartoes = repository.findByUsuario(usuario);
 
         return cartoes.stream()
-                .map(mapper::toResponse)
+                .map(cartao -> {
+                    CartaoResponse response = mapper.toResponse(cartao);
+
+                    LocalDate hoje = LocalDate.now();
+                    LocalDate inicioMes = hoje.withDayOfMonth(1);
+                    LocalDate fimMes = hoje.withDayOfMonth(hoje.lengthOfMonth());
+
+                    BigDecimal valorFatura = parcelaRepository.somarFaturaAtual(
+                            cartao.getId(), inicioMes, fimMes
+                    );
+
+
+                    return new CartaoResponse(
+                            response.id(),
+                            response.nome(),
+                            response.limiteTotal(),
+                            response.limiteDisponivel(),
+                            response.diaVencimento(),
+                            response.diaFechamento(),
+                            valorFatura
+                    );
+                })
                 .toList();
     }
 

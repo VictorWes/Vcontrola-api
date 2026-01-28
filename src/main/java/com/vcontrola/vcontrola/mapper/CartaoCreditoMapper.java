@@ -22,10 +22,12 @@ public class CartaoCreditoMapper {
     }
 
     public CartaoResponse toResponse(CartaoCredito cartao) {
+
         return new CartaoResponse(
                 cartao.getId(),
                 cartao.getNome(),
                 cartao.getLimiteTotal(),
+                cartao.getLimiteDisponivel(),
                 cartao.getDiaVencimento(),
                 cartao.getDiaFechamento(),
                 BigDecimal.ZERO

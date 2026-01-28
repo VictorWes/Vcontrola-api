@@ -50,6 +50,8 @@ public class SecurityConfigurations {
 
 
                         .requestMatchers("/cartoes", "/cartoes/**").permitAll()
+                        .requestMatchers("/compras", "/compras/**").authenticated()
+                        .requestMatchers("/parcelas", "/parcelas/**").authenticated()
                         .requestMatchers("/dashboard", "/dashboard/**").authenticated()
                         .requestMatchers("/planejamento", "/planejamento/**").authenticated()
 
