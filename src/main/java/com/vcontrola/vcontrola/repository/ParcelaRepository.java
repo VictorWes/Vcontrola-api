@@ -28,4 +28,6 @@ public interface ParcelaRepository extends JpaRepository<Parcela, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
+
+    boolean existsByCompraIdAndPagaFalse(UUID compraId);
 }

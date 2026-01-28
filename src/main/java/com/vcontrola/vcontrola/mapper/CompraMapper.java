@@ -21,7 +21,7 @@ public class CompraMapper {
         return compra;
     }
 
-    public CompraResponse toResponse(Compra compra) {
+    public CompraResponse toResponse(Compra compra, boolean isQuitada) {
 
         BigDecimal valorParcela = BigDecimal.ZERO;
 
@@ -36,7 +36,9 @@ public class CompraMapper {
                 compra.getValorTotal(),
                 compra.getQtdeParcelas(),
                 valorParcela,
-                compra.getDataCompra()
+                compra.getDataCompra(),
+                isQuitada
+
         );
     }
 

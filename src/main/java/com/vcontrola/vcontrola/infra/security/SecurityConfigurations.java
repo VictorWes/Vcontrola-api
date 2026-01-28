@@ -31,12 +31,8 @@ public class SecurityConfigurations {
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-
                 .csrf(csrf -> csrf.disable())
-
-
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
 
                 .authorizeHttpRequests(authorize -> authorize
 
@@ -48,17 +44,16 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-
-                        .requestMatchers("/cartoes", "/cartoes/**").permitAll()
+                        // Rotas Privadas (O usuário TEM que estar logado)
+                        .requestMatchers("/cartoes", "/cartoes/**").authenticated() //
                         .requestMatchers("/compras", "/compras/**").authenticated()
                         .requestMatchers("/parcelas", "/parcelas/**").authenticated()
                         .requestMatchers("/dashboard", "/dashboard/**").authenticated()
                         .requestMatchers("/planejamento", "/planejamento/**").authenticated()
 
-
+                        // Qualquer outra coisa precisa de login
                         .anyRequest().authenticated()
                 )
-                // 5. Adiciona o filtro de Token
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

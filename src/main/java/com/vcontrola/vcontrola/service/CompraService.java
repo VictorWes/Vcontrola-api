@@ -5,9 +5,11 @@ import com.vcontrola.vcontrola.controller.response.CompraResponse;
 import com.vcontrola.vcontrola.entity.CartaoCredito;
 import com.vcontrola.vcontrola.entity.Compra;
 import com.vcontrola.vcontrola.entity.Parcela;
+import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.CompraMapper;
 import com.vcontrola.vcontrola.repository.CartaoCreditoRepository;
 import com.vcontrola.vcontrola.repository.CompraRepository;
+import com.vcontrola.vcontrola.repository.ParcelaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class CompraService {
     @Autowired
     private CompraMapper mapper;
 
+    @Autowired
+    private ParcelaRepository parcelaRepository;
+
     @Transactional
     public void criar(CompraRequest request) {
 
@@ -38,22 +43,13 @@ public class CompraService {
 
 
         if (cartao.getLimiteDisponivel().compareTo(request.valorTotal()) < 0) {
-            throw new RuntimeException("Limite insuficiente para esta compra!");
+            throw new RegraDeNegocioException("Limite insuficiente para esta compra!");
         }
-
-
         Compra compra = mapper.toEntity(request, cartao);
-
-
         List<Parcela> parcelas = new ArrayList<>();
-
-
         BigDecimal valorParcela = request.valorTotal()
                 .divide(BigDecimal.valueOf(request.qtdeParcelas()), 2, RoundingMode.HALF_UP);
-
-
         LocalDate dataBaseVencimento = request.dataCompra();
-
 
         if (dataBaseVencimento.getDayOfMonth() > cartao.getDiaFechamento()) {
             dataBaseVencimento = dataBaseVencimento.plusMonths(1);
@@ -82,9 +78,16 @@ public class CompraService {
     }
 
     public List<CompraResponse> listarPorCartao(UUID cartaoId) {
-        return compraRepository.findByCartaoIdOrderByDataCompraDesc(cartaoId)
-                .stream()
-                .map(mapper::toResponse)
+        List<Compra> compras = compraRepository.findByCartaoIdOrderByDataCompraDesc(cartaoId);
+
+        return compras.stream()
+                .map(compra -> {
+
+                    boolean existePendencia = parcelaRepository.existsByCompraIdAndPagaFalse(compra.getId());
+                    boolean isQuitada = !existePendencia;
+
+                    return mapper.toResponse(compra, isQuitada);
+                })
                 .toList();
     }
 }

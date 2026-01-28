@@ -10,6 +10,7 @@ public record CompraResponse (
         BigDecimal valorTotal,
         Integer qtdeParcelas,
         BigDecimal valorParcela,
-        LocalDate dataCompra
+        LocalDate dataCompra,
+        boolean isQuitada
 ) {
 }
