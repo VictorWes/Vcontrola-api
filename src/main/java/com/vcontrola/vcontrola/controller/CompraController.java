@@ -27,4 +27,18 @@ public class CompraController {
         List<CompraResponse> response = service.listarPorCartao(cartaoId);
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> editar(@PathVariable UUID id, @RequestBody CompraRequest request) {
+        service.editar(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable UUID id,
+            @RequestParam(required = false) UUID contaId) { // <--- Conta para onde o dinheiro volta
+
+        service.excluir(id, contaId);
+        return ResponseEntity.noContent().build();
+    }
 }
