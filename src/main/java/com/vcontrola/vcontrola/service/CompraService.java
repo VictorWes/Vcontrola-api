@@ -13,6 +13,8 @@ import com.vcontrola.vcontrola.repository.ContaRepository;
 import com.vcontrola.vcontrola.repository.ParcelaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -81,18 +83,13 @@ public class CompraService {
         cartaoRepository.save(cartao);
     }
 
-    public List<CompraResponse> listarPorCartao(UUID cartaoId) {
-        List<Compra> compras = compraRepository.findByCartaoIdOrderByDataCompraDesc(cartaoId);
+    public Page<CompraResponse> listarPorCartao(UUID cartaoId, Pageable pageable) {
+        Page<Compra> comprasPage = compraRepository.findByCartaoId(cartaoId, pageable);
 
-        return compras.stream()
-                .map(compra -> {
-
-                    boolean existePendencia = parcelaRepository.existsByCompraIdAndPagaFalse(compra.getId());
-                    boolean isQuitada = !existePendencia;
-
-                    return mapper.toResponse(compra, isQuitada);
-                })
-                .toList();
+        return comprasPage.map(compra -> {
+            boolean existePendencia = parcelaRepository.existsByCompraIdAndPagaFalse(compra.getId());
+            return mapper.toResponse(compra, !existePendencia);
+        });
     }
 
     @Transactional
@@ -109,8 +106,6 @@ public class CompraService {
                 throw new RegraDeNegocioException("Não é possível alterar valor ou parcelas de uma compra que já possui pagamentos efetuados. Exclua os pagamentos primeiro.");
             }
         } else {
-
-
 
             CartaoCredito cartao = compra.getCartao();
             cartao.setLimiteDisponivel(cartao.getLimiteDisponivel().add(compra.getValorTotal()));
@@ -146,10 +141,7 @@ public class CompraService {
                 .orElseThrow(() -> new RuntimeException("Compra não encontrada"));
 
         CartaoCredito cartao = compra.getCartao();
-
-
         BigDecimal valorJaPago = BigDecimal.ZERO;
-
         for (Parcela p : compra.getParcelas()) {
             if (p.isPaga()) {
                 valorJaPago = valorJaPago.add(p.getValorParcela());
@@ -168,16 +160,12 @@ public class CompraService {
             contaRepository.save(conta);
         }
 
-
         cartao.setLimiteDisponivel(cartao.getLimiteDisponivel().add(compra.getValorTotal()));
-
 
         if (cartao.getLimiteDisponivel().compareTo(cartao.getLimiteTotal()) > 0) {
             cartao.setLimiteDisponivel(cartao.getLimiteTotal());
         }
-
         cartaoRepository.save(cartao);
-
 
         compraRepository.delete(compra);
     }
