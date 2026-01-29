@@ -5,6 +5,7 @@ import com.vcontrola.vcontrola.entity.CartaoCredito;
 import com.vcontrola.vcontrola.entity.Conta;
 import com.vcontrola.vcontrola.entity.Parcela;
 import com.vcontrola.vcontrola.entity.Usuario;
+import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.ParcelaMapper;
 import com.vcontrola.vcontrola.repository.CartaoCreditoRepository;
 import com.vcontrola.vcontrola.repository.ContaRepository;
@@ -60,7 +61,7 @@ public class ParcelaService {
         }
 
         if (conta.getSaldo().compareTo(parcela.getValorParcela()) < 0) {
-            throw new RuntimeException("Saldo insuficiente na conta " + conta.getNome());
+            throw new RegraDeNegocioException("Saldo insuficiente na conta " + conta.getNome() + " para realizar este pagamento.");
         }
 
         conta.setSaldo(conta.getSaldo().subtract(parcela.getValorParcela()));
