@@ -2,8 +2,15 @@ package com.vcontrola.vcontrola.mapper;
 
 import com.vcontrola.vcontrola.controller.request.TransacaoRequest;
 import com.vcontrola.vcontrola.controller.response.TransacaoResponse;
+import com.vcontrola.vcontrola.entity.Conta;
 import com.vcontrola.vcontrola.entity.Transacao;
+import com.vcontrola.vcontrola.entity.Usuario;
+import com.vcontrola.vcontrola.enums.StatusTransacaoCartao;
+import com.vcontrola.vcontrola.enums.TipoTransacao;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Component
 public class TransacaoMapper {
@@ -16,6 +23,27 @@ public class TransacaoMapper {
         transacao.setStatus(request.status());
         transacao.setData(request.data());
         transacao.setNumeroParcela(request.numeroParcela());
+
+        return transacao;
+    }
+
+    public Transacao criarTransacaoPagamento(
+            String descricao,
+            BigDecimal valor,
+            TipoTransacao tipo,
+            Conta conta,
+            StatusTransacaoCartao status,
+            String numeroParcela // Adicionado para preencher o campo da entidade
+    ) {
+        Transacao transacao = new Transacao();
+
+        transacao.setDescricao(descricao);
+        transacao.setValor(valor);
+        transacao.setTipo(tipo);
+        transacao.setConta(conta); // Apenas a conta faz o vínculo
+        transacao.setStatus(status);
+        transacao.setData(LocalDate.now());
+        transacao.setNumeroParcela(numeroParcela); // Preenche o campo específico
 
         return transacao;
     }
