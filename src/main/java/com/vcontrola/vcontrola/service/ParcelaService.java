@@ -48,9 +48,7 @@ public class ParcelaService {
 
     @Transactional
     public void pagar(UUID idParcela, UUID idConta, Usuario usuario) {
-        // --------------------------------------------------------------------
-        // 1. BUSCAS E VALIDAÇÕES
-        // --------------------------------------------------------------------
+
         Parcela parcela = repository.findById(idParcela)
                 .orElseThrow(() -> new RuntimeException("Parcela não encontrada"));
 
@@ -61,63 +59,54 @@ public class ParcelaService {
         Conta conta = contaRepository.findById(idConta)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
 
-        // Validação de Segurança (Se a conta e o cartão pertencem ao usuário logado)
+
         if (!conta.getUsuario().getId().equals(usuario.getId()) ||
                 !parcela.getCompra().getCartao().getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("Acesso negado");
         }
 
-        // Validação de Saldo (Retorna erro 422 para o Front tratar)
+
         if (conta.getSaldo().compareTo(parcela.getValorParcela()) < 0) {
             throw new RegraDeNegocioException("Saldo insuficiente na conta " + conta.getNome() + " para realizar este pagamento.");
         }
 
-        // --------------------------------------------------------------------
-        // 2. LÓGICA FINANCEIRA (Débito e Limite)
-        // --------------------------------------------------------------------
 
-        // Debita da conta
+
         conta.setSaldo(conta.getSaldo().subtract(parcela.getValorParcela()));
 
-        // Restaura limite do cartão
+
         CartaoCredito cartao = parcela.getCompra().getCartao();
         BigDecimal novoLimite = cartao.getLimiteDisponivel().add(parcela.getValorParcela());
 
-        // Trava para não exceder o limite total
+
         if (novoLimite.compareTo(cartao.getLimiteTotal()) > 0) {
             novoLimite = cartao.getLimiteTotal();
         }
         cartao.setLimiteDisponivel(novoLimite);
 
-        // Marca como paga
+
         parcela.setPaga(true);
 
-        // --------------------------------------------------------------------
-        // 3. CRIAÇÃO DO HISTÓRICO (Usando seu Mapper Novo)
-        // --------------------------------------------------------------------
 
-        // Formata a string "1/10"
         String numParcelaFormatado = parcela.getNumeroParcela() + "/" + parcela.getCompra().getQtdeParcelas();
 
-        // Cria a descrição
+
         String descricao = "Pagamento: " + parcela.getCompra().getNome();
 
-        // Chama o mapper passando os parâmetros soltos
+
         Transacao novaTransacao = transacaoMapper.criarTransacaoPagamento(
-                descricao,                      // String descricao
-                parcela.getValorParcela(),      // BigDecimal valor
-                TipoTransacao.GASTOS,          // TipoTransacao tipo
-                conta,                          // Conta conta (Objeto)
-                StatusTransacaoCartao.PAGO,     // StatusTransacaoCartao status
-                numParcelaFormatado             // String numeroParcela
+                descricao,
+                parcela.getValorParcela(),
+                TipoTransacao.GASTOS,
+                conta,
+                StatusTransacaoCartao.PAGO,
+                numParcelaFormatado
         );
 
-        // Salva a transação gerada
+
         transacaoRepository.save(novaTransacao);
 
-        // --------------------------------------------------------------------
-        // 4. PERSISTÊNCIA FINAL
-        // --------------------------------------------------------------------
+
         contaRepository.save(conta);
         cartaoRepository.save(cartao);
         repository.save(parcela);

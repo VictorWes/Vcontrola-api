@@ -33,17 +33,17 @@ public class TransacaoMapper {
             TipoTransacao tipo,
             Conta conta,
             StatusTransacaoCartao status,
-            String numeroParcela // Adicionado para preencher o campo da entidade
+            String numeroParcela
     ) {
         Transacao transacao = new Transacao();
 
         transacao.setDescricao(descricao);
         transacao.setValor(valor);
         transacao.setTipo(tipo);
-        transacao.setConta(conta); // Apenas a conta faz o vínculo
+        transacao.setConta(conta);
         transacao.setStatus(status);
         transacao.setData(LocalDate.now());
-        transacao.setNumeroParcela(numeroParcela); // Preenche o campo específico
+        transacao.setNumeroParcela(numeroParcela);
 
         return transacao;
     }
