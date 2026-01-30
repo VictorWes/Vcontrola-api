@@ -5,6 +5,7 @@ import com.vcontrola.vcontrola.controller.response.ContaResponse;
 import com.vcontrola.vcontrola.entity.Conta;
 import com.vcontrola.vcontrola.entity.TipoContaUsuario;
 import com.vcontrola.vcontrola.entity.Usuario;
+import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.ContaMapper;
 import com.vcontrola.vcontrola.repository.ContaRepository;
 import com.vcontrola.vcontrola.repository.ItemPlanejamentoRepository;
@@ -74,26 +75,22 @@ public class ContaService {
     }
 
     public void excluir(UUID id, Usuario usuario) {
-
-
         Conta conta = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada."));
+                .orElseThrow(() -> new RegraDeNegocioException("Conta não encontrada.")); // Pode mudar aqui também
 
 
         if (!conta.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("Acesso negado: Você não pode excluir esta conta.");
+            throw new RegraDeNegocioException("Acesso negado: Você não pode excluir esta conta.");
         }
 
-
         if (transacaoRepository.existsByContaId(id)) {
-            throw new RuntimeException("Não é possível excluir: Existem transações vinculadas a esta conta. Exclua as transações primeiro.");
+            throw new RegraDeNegocioException("Não é possível excluir: Existem transações vinculadas a esta conta. Exclua as transações primeiro.");
         }
 
 
         if (itemPlanejamentoRepository.existsByContaDestinoId(id)) {
-            throw new RuntimeException("Não é possível excluir: Esta conta está sendo usada no Planejamento Financeiro.");
+            throw new RegraDeNegocioException("Não é possível excluir: Esta conta está sendo usada no Planejamento Financeiro.");
         }
-
 
         repository.delete(conta);
     }
