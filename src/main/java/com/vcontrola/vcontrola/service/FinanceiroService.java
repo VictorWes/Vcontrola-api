@@ -7,6 +7,7 @@ import com.vcontrola.vcontrola.entity.*;
 import com.vcontrola.vcontrola.enums.StatusPlanejamento;
 import com.vcontrola.vcontrola.enums.StatusTransacaoCartao;
 import com.vcontrola.vcontrola.enums.TipoTransacao;
+import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.FinanceiroMapper;
 import com.vcontrola.vcontrola.repository.*;
 import jakarta.transaction.Transactional;
@@ -103,18 +104,21 @@ public class FinanceiroService {
 
     @Transactional
     public void alternarStatus(UUID itemId, Usuario usuario) {
-        ItemPlanejamento item = itemRepo.findById(itemId).orElseThrow();
+        ItemPlanejamento item = itemRepo.findById(itemId)
+                .orElseThrow(() -> new RegraDeNegocioException("Item não encontrado"));
+
         ControleFinanceiro controle = item.getControle();
 
         if (!controle.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("Acesso negado");
+            throw new RegraDeNegocioException("Acesso negado");
         }
 
         if (item.getStatus() == StatusPlanejamento.PENDENTE) {
-            // Guardar
+
             if (controle.getSaldoDisponivel().compareTo(item.getValor()) < 0) {
-                throw new RuntimeException("Saldo virtual insuficiente!");
+                throw new RegraDeNegocioException("Saldo ficticio disponivel é insuficiente para esta reserva!");
             }
+
             controle.setSaldoDisponivel(controle.getSaldoDisponivel().subtract(item.getValor()));
 
             TransacaoRequest deposito = new TransacaoRequest(
@@ -131,7 +135,7 @@ public class FinanceiroService {
             item.setStatus(StatusPlanejamento.GUARDADO);
 
         } else {
-            // Estornar
+
             controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(item.getValor()));
 
             TransacaoRequest saque = new TransacaoRequest(
