@@ -183,14 +183,7 @@ public class FinanceiroService {
             throw new RuntimeException("O valor do resgate não pode ser maior que o valor guardado.");
         }
 
-        ControleFinanceiro controle = item.getControle();
-
-
         item.setValor(item.getValor().subtract(valorResgate));
-
-
-        controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(valorResgate));
-
 
         TransacaoRequest saque = new TransacaoRequest(
                 "Resgate Parcial: " + item.getCarteira().getNome(),
@@ -209,6 +202,6 @@ public class FinanceiroService {
         }
 
         itemRepo.save(item);
-        controleRepo.save(controle);
+
     }
 }
