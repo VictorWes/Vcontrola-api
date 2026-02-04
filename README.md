@@ -48,7 +48,7 @@ VControla é um sistema completo de gestão financeira desenvolvido para control
 - ✅ Endpoints privados protegidos por token
 - ✅ Configuração de segurança com Spring Security
 - ✅ CSRF desabilitado para API REST
-- ✅ SecurityFilter personalizado para validação de tokens
+- ✅ SecurityFilter personalizado para validação de tokensc
 - ✅ Controle de acesso por usuário autenticado
 
 ## 🐳 Docker
