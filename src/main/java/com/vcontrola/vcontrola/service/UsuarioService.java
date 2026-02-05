@@ -1,5 +1,6 @@
 package com.vcontrola.vcontrola.service;
 
+import com.vcontrola.vcontrola.controller.request.AlterarSenhaRequest;
 import com.vcontrola.vcontrola.controller.request.LoginRequest;
 import com.vcontrola.vcontrola.controller.request.UsuarioRequest;
 import com.vcontrola.vcontrola.controller.response.LoginResponse;
@@ -7,6 +8,7 @@ import com.vcontrola.vcontrola.controller.response.UsuarioResponse;
 import com.vcontrola.vcontrola.entity.TipoContaUsuario;
 import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.enums.TipoConta;
+import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.UsuarioMapper;
 import com.vcontrola.vcontrola.repository.TipoContaUsuarioRepository;
 import com.vcontrola.vcontrola.repository.UsuarioRepository;
@@ -76,5 +78,17 @@ public class UsuarioService {
         tipo.setUsuario(usuario);
 
         tipoContaUsuarioRepository.save(tipo);
+    }
+
+    @Transactional
+    public void alterarSenha(AlterarSenhaRequest dados, Usuario usuario) {
+        if (!passwordEncoder.matches(dados.senhaAtual(), usuario.getSenha())) {
+            throw new RegraDeNegocioException("A senha atual informada está incorreta.");
+        }
+
+        String novaSenhaHash = passwordEncoder.encode(dados.novaSenha());
+        usuario.setSenha(novaSenhaHash);
+
+        usuarioRepository.save(usuario);
     }
 }

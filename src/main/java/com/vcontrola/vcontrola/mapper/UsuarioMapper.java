@@ -25,11 +25,13 @@ public class UsuarioMapper {
         if (usuario == null) {
             return null;
         }
+        boolean isGoogle = usuario.getSenha() == null;
 
         return new UsuarioResponse(
                 usuario.getId(),
                 usuario.getNome(),
-                usuario.getEmail()
+                usuario.getEmail(),
+                isGoogle
         );
     }
 }
