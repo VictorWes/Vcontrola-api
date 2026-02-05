@@ -32,8 +32,6 @@ public class Usuario implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
     private String senha;
 
 

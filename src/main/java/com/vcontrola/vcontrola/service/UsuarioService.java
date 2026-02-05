@@ -1,6 +1,7 @@
 package com.vcontrola.vcontrola.service;
 
 import com.vcontrola.vcontrola.controller.request.AlterarSenhaRequest;
+import com.vcontrola.vcontrola.controller.request.AtualizarUsuarioRequest;
 import com.vcontrola.vcontrola.controller.request.LoginRequest;
 import com.vcontrola.vcontrola.controller.request.UsuarioRequest;
 import com.vcontrola.vcontrola.controller.response.LoginResponse;
@@ -12,6 +13,7 @@ import com.vcontrola.vcontrola.infra.exception.RegraDeNegocioException;
 import com.vcontrola.vcontrola.mapper.UsuarioMapper;
 import com.vcontrola.vcontrola.repository.TipoContaUsuarioRepository;
 import com.vcontrola.vcontrola.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -90,5 +92,34 @@ public class UsuarioService {
         usuario.setSenha(novaSenhaHash);
 
         usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public UsuarioResponse atualizarPerfil(Usuario usuarioDoToken, AtualizarUsuarioRequest dados) {
+
+        // 1. IGNORA O USUÁRIO DO TOKEN E BUSCA O REAL NO BANCO
+        // Isso garante que todas as listas e campos obrigatórios estejam preenchidos
+        Usuario usuarioBanco = usuarioRepository.findById(usuarioDoToken.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        // 2. ATUALIZA OS DADOS NO OBJETO DO BANCO
+        usuarioBanco.setNome(dados.nome());
+
+        // 3. Lógica do Email (Mantém igual)
+        if (usuarioBanco.getSenha() != null && dados.email() != null) {
+            if (!dados.email().equals(usuarioBanco.getEmail())) {
+                boolean emailExiste = usuarioRepository.findByEmail(dados.email()).isPresent();
+                if (emailExiste) {
+                    throw new RegraDeNegocioException("Este e-mail já está em uso.");
+                }
+                usuarioBanco.setEmail(dados.email());
+            }
+        }
+
+        // 4. SALVA O OBJETO COMPLETO
+        Usuario usuarioSalvo = usuarioRepository.save(usuarioBanco);
+
+        // Retorna convertendo
+        return usuarioMapper.toResponse(usuarioSalvo);
     }
 }

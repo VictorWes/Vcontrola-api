@@ -57,7 +57,7 @@ public class GoogleLogService {
             usuario = new Usuario();
             usuario.setNome(nome);
             usuario.setEmail(email);
-            usuario.setSenha(passwordEncoder.encode("GOOGLE_AUTH_" + java.util.UUID.randomUUID().toString()));
+            usuario.setSenha(null);
 
             repository.save(usuario);
         }

@@ -51,6 +51,8 @@ public class SecurityConfigurations {
                         .requestMatchers("/dashboard", "/dashboard/**").authenticated()
                         .requestMatchers("/planejamento", "/planejamento/**").authenticated()
 
+                        .requestMatchers("/error").permitAll()
+
                         // Qualquer outra coisa precisa de login
                         .anyRequest().authenticated()
                 )

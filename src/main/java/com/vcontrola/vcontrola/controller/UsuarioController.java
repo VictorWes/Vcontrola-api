@@ -1,9 +1,6 @@
 package com.vcontrola.vcontrola.controller;
 
-import com.vcontrola.vcontrola.controller.request.AlterarSenhaRequest;
-import com.vcontrola.vcontrola.controller.request.GoogleLoginRequest;
-import com.vcontrola.vcontrola.controller.request.LoginRequest;
-import com.vcontrola.vcontrola.controller.request.UsuarioRequest;
+import com.vcontrola.vcontrola.controller.request.*;
 import com.vcontrola.vcontrola.controller.response.LoginResponse;
 import com.vcontrola.vcontrola.controller.response.UsuarioResponse;
 import com.vcontrola.vcontrola.entity.Usuario;
@@ -65,6 +62,15 @@ public class UsuarioController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PutMapping("/perfil") 
+    public ResponseEntity<UsuarioResponse> atualizarPerfil(
+            @RequestBody @Valid AtualizarUsuarioRequest dados,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+
+        UsuarioResponse usuarioAtualizado = usuarioService.atualizarPerfil(usuarioLogado, dados);
+
+        return ResponseEntity.ok(usuarioAtualizado);
+    }
 
     @PatchMapping("/senha")
     public ResponseEntity<Void> alterarSenha(
@@ -82,4 +88,6 @@ public class UsuarioController {
         UsuarioResponse response = usuarioMapper.toResponse(usuarioLogado);
         return ResponseEntity.ok(response);
     }
+
+
 }
