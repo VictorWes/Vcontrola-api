@@ -97,15 +97,10 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse atualizarPerfil(Usuario usuarioDoToken, AtualizarUsuarioRequest dados) {
 
-        // 1. IGNORA O USUÁRIO DO TOKEN E BUSCA O REAL NO BANCO
-        // Isso garante que todas as listas e campos obrigatórios estejam preenchidos
+
         Usuario usuarioBanco = usuarioRepository.findById(usuarioDoToken.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-
-        // 2. ATUALIZA OS DADOS NO OBJETO DO BANCO
         usuarioBanco.setNome(dados.nome());
-
-        // 3. Lógica do Email (Mantém igual)
         if (usuarioBanco.getSenha() != null && dados.email() != null) {
             if (!dados.email().equals(usuarioBanco.getEmail())) {
                 boolean emailExiste = usuarioRepository.findByEmail(dados.email()).isPresent();
@@ -115,11 +110,7 @@ public class UsuarioService {
                 usuarioBanco.setEmail(dados.email());
             }
         }
-
-        // 4. SALVA O OBJETO COMPLETO
         Usuario usuarioSalvo = usuarioRepository.save(usuarioBanco);
-
-        // Retorna convertendo
         return usuarioMapper.toResponse(usuarioSalvo);
     }
 }
