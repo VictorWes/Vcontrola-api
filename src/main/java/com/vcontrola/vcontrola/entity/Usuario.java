@@ -34,6 +34,7 @@ public class Usuario implements UserDetails {
 
     private String senha;
 
+    private String tokenRecuperacao;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
