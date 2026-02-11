@@ -39,6 +39,9 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios/google").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuarios/conta/recuperar-senha").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuarios/conta/redefinir-senha").permitAll()
+
 
 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
