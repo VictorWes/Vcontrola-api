@@ -15,8 +15,12 @@ import com.vcontrola.vcontrola.repository.TipoContaUsuarioRepository;
 import com.vcontrola.vcontrola.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -25,6 +29,11 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final TipoContaUsuarioRepository tipoContaUsuarioRepository;
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder, TokenService tokenService, TipoContaUsuarioRepository tipoContaUsuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -37,16 +46,42 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse cadastrarUsuario(UsuarioRequest request) {
 
+
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new RuntimeException("Já existe um usuário com este e-mail.");
         }
 
         Usuario usuarioNovo = usuarioMapper.toEntity(request);
-
         String senhaCriptografada = passwordEncoder.encode(usuarioNovo.getSenha());
         usuarioNovo.setSenha(senhaCriptografada);
-
         Usuario usuarioSalvo = usuarioRepository.save(usuarioNovo);
+        inicializarTiposPadrao(usuarioSalvo);
+
+
+        try {
+            String mensagem = String.format("""
+                Olá, %s!
+                
+                Seja muito bem-vindo(a) ao VControla! 🚀
+                
+                Seu cadastro foi realizado com sucesso. Agora você tem o controle total 
+                da sua vida financeira na palma da mão.
+                
+                Acesse agora: https://vcontrola.vercel.app/auth/login
+                
+                Atenciosamente,
+                Equipe VControla.
+                """, usuarioSalvo.getNome());
+
+            emailService.enviarEmailTexto(
+                    usuarioSalvo.getEmail(),
+                    "Bem-vindo ao VControla! 🎉",
+                    mensagem
+            );
+        } catch (Exception e) {
+            System.err.println("Falha ao enviar e-mail de boas-vindas: " + e.getMessage());
+        }
+        // 👆 FIM DO BLOCO DE E-MAIL 👆
 
         return usuarioMapper.toResponse(usuarioSalvo);
     }
@@ -112,5 +147,37 @@ public class UsuarioService {
         }
         Usuario usuarioSalvo = usuarioRepository.save(usuarioBanco);
         return usuarioMapper.toResponse(usuarioSalvo);
+    }
+
+    public void recuperarSenha(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        String token = UUID.randomUUID().toString();
+
+        usuario.setTokenRecuperacao(token);
+        usuarioRepository.save(usuario);
+
+        String link = frontendUrl + "/conta/nova-senha?token=" + token;
+
+        String mensagem = String.format("""
+                Olá, %s!
+                Clique abaixo para redefinir sua senha:
+                %s
+                """, usuario.getNome(), link);
+
+        emailService.enviarEmailTexto(usuario.getEmail(), "Recuperação de Senha", mensagem);
+    }
+
+    @Transactional
+    public void redefinirSenha(String token, String novaSenha) {
+        Usuario usuario = usuarioRepository.findByTokenRecuperacao(token)
+                .orElseThrow(() -> new RegraDeNegocioException("Link inválido ou expirado."));
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+
+        usuario.setTokenRecuperacao(null);
+
+        usuarioRepository.save(usuario);
     }
 }

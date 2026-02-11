@@ -1,4 +1,11 @@
 package com.vcontrola.vcontrola.controller.request;
 
-public record DefinirNovaSenhaRequest() {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record DefinirNovaSenhaRequest(
+
+        @NotBlank String token,
+        @NotBlank @Size(min = 6) String novaSenha
+) {
 }
