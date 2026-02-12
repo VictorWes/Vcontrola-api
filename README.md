@@ -1,16 +1,16 @@
 # VControla - Sistema de Gestão Financeira 💰
 
-> **Status:** 🚀 **EM PRODUÇÃO**
+> **Status:** 🚀 **EM PRODUÇÃO (Deploy realizado)**
 
 ## 🌐 Acesso ao Sistema
 
-**🔗 Aplicação em Produção:** [https://vcontrola.vercel.app/auth/login](https://vcontrola.vercel.app/auth/login)
+**🔗 Aplicação em Produção (Frontend):** https://vcontrola.vercel.app/auth/login
 
-> ⚠️ **Importante:** A aplicação já está disponível para testes! Acesse o link acima para criar sua conta e começar a usar.
+> ⚠️ **Importante:** A aplicação está em produção e pode ser testada pelo link acima.
 
 ## 📋 Sobre o Projeto
 
-VControla é um sistema completo de gestão financeira desenvolvido para controle de contas, transações, cartões de crédito e planejamento financeiro. O projeto oferece uma API REST robusta integrada com uma aplicação Angular moderna e responsiva, permitindo controle total sobre suas finanças pessoais.
+VControla é um sistema de gestão financeira para controle de contas, transações, cartões de crédito e planejamento financeiro. O backend REST em Spring Boot fornece APIs consumidas por um frontend Angular hospedado no Vercel.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -21,9 +21,9 @@ VControla é um sistema completo de gestão financeira desenvolvido para control
 - **Spring Security**
 - **JWT (JSON Web Token)** - Autenticação e autorização
 - **PostgreSQL** - Banco de dados
-- **Docker** - Containerização
+- **Docker / Docker Compose** - Containerização
 - **Lombok** - Redução de código boilerplate
-- **Bean Validation** - Validação de dados (@NotBlank, @NotNull, etc)
+- **Bean Validation** - Validação de dados (@NotBlank, @NotNull, etc.)
 - **Maven** - Gerenciamento de dependências
 
 ### Frontend
@@ -34,10 +34,17 @@ VControla é um sistema completo de gestão financeira desenvolvido para control
 - **HttpClient** - Comunicação com API
 - **Vercel** - Deploy e hospedagem
 
-### DevOps & Deploy
-- **Vercel** - Hospedagem do frontend
-- **Docker Compose** - Orquestração de containers
-- **GitHub** - Controle de versão
+## ✅ Atualizações recentes (implementadas no projeto)
+- Deploy do frontend feito em Vercel: https://vcontrola.vercel.app/auth/login
+- Implementação e proteção de rotas com JWT e SecurityFilter customizado (validação de token em cada requisição).
+- TokenService e configurações de segurança centralizadas em infra/security.
+- CORS configurado para permitir comunicação entre Angular (http://localhost:4200) e a API.
+- CSRF desabilitado para a API REST (comente e documente se necessário para revisões de segurança).
+- GlobalExceptionHandler aprimorado, incluindo tratamento de DataIntegrityViolationException para retornar 409 Conflict com mensagem amigável quando há vínculos que impedem exclusão.
+- Validações com Bean Validation ativas nas entidades (ex.: @NotBlank, @NotNull).
+- Mappers implementados (ContaMapper, CompraMapper, etc.) para conversão DTO <-> Entity.
+- Regras de negócio reforçadas: validação de saldo, controle de limite de cartão, geração automática de parcelas, estorno de pagamentos.
+- Endpoints públicos: cadastro e login. Demais endpoints protegidos por autenticação.
 
 ## 🔐 Segurança
 
@@ -328,3 +335,4 @@ Projeto em desenvolvimento ativo. Sugestões e melhorias são bem-vindas!
 **VControla** - Seu controle financeiro completo e inteligente 💼
 
 🚀 **[Teste agora em produção!](https://vcontrola.vercel.app/auth/login)**
+
