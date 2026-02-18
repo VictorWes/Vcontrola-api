@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -230,6 +231,43 @@ class CartaoCreditoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando ocorrer erro ao salvar no banco (ex: restrição única)")
+    void criar_QuandoErroNoBanco_DeveLancarExcecao() {
+        // ARRANGE
+        CartaoRequest requestMock = new CartaoRequest("Nubank", BigDecimal.valueOf(5000), 10, 3);
+        when(mapper.toEntity(requestMock, usuarioMock)).thenReturn(cartaoMock);
+
+        when(repository.save(cartaoMock)).thenThrow(new DataIntegrityViolationException("Erro de restrição"));
+
+        // ACT & ASSERT
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            cartaoCreditoService.criar(requestMock, usuarioMock);
+        });
+
+
+        verify(mapper, times(1)).toEntity(requestMock, usuarioMock);
+        verify(repository, times(1)).save(cartaoMock);
+    }
+
+    @Test
+    @DisplayName("Não deve chamar o repositório se ocorrer erro no mapeamento")
+    void criar_QuandoMapperFalhar_NaoDeveSalvarNoBanco() {
+        // ARRANGE
+        CartaoRequest requestNulo = null;
+
+
+        when(mapper.toEntity(requestNulo, usuarioMock)).thenThrow(new IllegalArgumentException("Request nulo"));
+
+        // ACT & ASSERT
+        assertThrows(IllegalArgumentException.class, () -> {
+            cartaoCreditoService.criar(requestNulo, usuarioMock);
+        });
+
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("Deve atualizar um cartão de crédito existente para o usuário")
     void atualizar_DeveAtualizarCartaoCredito() {
         //ARRANGE
@@ -252,6 +290,33 @@ class CartaoCreditoServiceTest {
         // ASSERT
         verify(repository, times(1)).findById(cartaoId);
         verify(repository, times(1)).save(cartaoMock);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar atualizar para um valor negativo")
+    void atualizar_QuandoLimiteNegativo_DeveLancarExcecao() {
+        // ARRANGE
+        CartaoRequest requestMock = new CartaoRequest(
+                "Nubank",
+                BigDecimal.valueOf(-1000), // Limite negativo
+                10,
+                3
+        );
+
+        cartaoMock.setUsuario(usuarioMock);
+
+        cartaoMock.setLimiteTotal(BigDecimal.valueOf(5000));
+        cartaoMock.setLimiteDisponivel(BigDecimal.valueOf(5000));
+
+        when(repository.findById(cartaoId)).thenReturn(java.util.Optional.of(cartaoMock));
+
+        // ACT & ASSERT
+        assertThrows(IllegalArgumentException.class, () -> {
+            cartaoCreditoService.atualizar(cartaoId, requestMock, usuarioMock);
+        });
+
+        verify(repository, times(1)).findById(cartaoId);
+
     }
 
     @Test

@@ -27,10 +27,10 @@ public class CartaoCreditoService {
     @Autowired
     private CartaoCreditoMapper mapper;
 
-    public void criar(CartaoRequest request, Usuario usuario) {
-        CartaoCredito cartao = mapper.toEntity(request, usuario);
-        repository.save(cartao);
-    }
+        public void criar(CartaoRequest request, Usuario usuario) {
+            CartaoCredito cartao = mapper.toEntity(request, usuario);
+            repository.save(cartao);
+        }
 
     public List<CartaoResponse> listar(Usuario usuario) {
         List<CartaoCredito> cartoes = repository.findByUsuario(usuario);
@@ -71,6 +71,10 @@ public class CartaoCreditoService {
 
         if (!cartao.getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("Acesso negado a este cartão");
+        }
+
+        if (request.limite().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("O limite do cartão não pode ser negativo.");
         }
 
         if (request.limite().compareTo(cartao.getLimiteTotal()) != 0) {
