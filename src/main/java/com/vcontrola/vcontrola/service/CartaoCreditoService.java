@@ -47,6 +47,9 @@ public class CartaoCreditoService {
                             cartao.getId(), inicioMes, fimMes
                     );
 
+                    if(valorFatura == null) {
+                        valorFatura = BigDecimal.ZERO;
+                    }
 
                     return new CartaoResponse(
                             response.id(),
