@@ -38,6 +38,13 @@ public class FinanceiroService {
     @Transactional
     public void adicionarSaldoVirtual(BigDecimal valor, Usuario usuario) {
         ControleFinanceiro controle = obterControleDoUsuario(usuario);
+
+        BigDecimal novoSaldo = controle.getSaldoDisponivel().add(valor);
+        if (novoSaldo.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RegraDeNegocioException("O valor a ser reduzido é maior que o saldo disponível.");
+        }
+        
+        
         controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(valor));
         controleRepo.save(controle);
     }
