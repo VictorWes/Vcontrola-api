@@ -120,12 +120,12 @@ class ContaServiceTest {
     @DisplayName("Deve listar as contas associadas a um usuário")
     void listarContasPorUsuario() {
         // 1. Arrange
-        // Como você já criou a 'conta' no setUp(), só precisamos criar o response falso
+
         ContaResponse responseFalso = new ContaResponse(
                 contaId, "Conta Teste", BigDecimal.ZERO, null
         );
 
-        // Ensinamos o Mockito
+
         when(repository.findByUsuarioId(usuarioId)).thenReturn(List.of(conta));
         when(mapper.toResponse(conta)).thenReturn(responseFalso);
 
@@ -134,8 +134,8 @@ class ContaServiceTest {
 
         // 3. Assert
         assertNotNull(contas);
-        assertEquals(1, contas.size()); // Garante que a lista tem 1 item
-        assertEquals(contaId, contas.get(0).id()); // Garante que o item é o response certo
+        assertEquals(1, contas.size());
+        assertEquals(contaId, contas.get(0).id());
 
         verify(repository).findByUsuarioId(usuarioId);
         verify(mapper).toResponse(conta);
