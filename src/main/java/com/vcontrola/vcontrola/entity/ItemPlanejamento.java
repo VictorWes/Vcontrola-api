@@ -21,7 +21,7 @@ public class ItemPlanejamento {
     @JoinColumn(name = "carteira_id")
     private TipoContaUsuario carteira;
 
-    private BigDecimal valor; // Ex: 50.00
+    private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
     private StatusPlanejamento status;
@@ -33,4 +33,6 @@ public class ItemPlanejamento {
     @ManyToOne
     @JoinColumn(name = "controle_id")
     private ControleFinanceiro controle;
+
+    private BigDecimal valorGuardado = BigDecimal.ZERO;
 }
