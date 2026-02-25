@@ -13,6 +13,7 @@ public record ItemPlanejamentoResponse(
         BigDecimal valor,
         StatusPlanejamento status,
         String nomeContaDestino,
-        UUID contaDestinoId
+        UUID contaDestinoId,
+        BigDecimal valorGuardado
 ) {
 }
