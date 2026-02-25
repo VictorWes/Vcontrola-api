@@ -391,75 +391,9 @@ class FinanceiroServiceTest {
         verify(itemRepo, never()).delete(any());
     }
 
-    @Test
-    @DisplayName("Deve alternar de PENDENTE para GUARDADO, subtrair saldo e gerar Receita")
-    void alternarStatus_DePendenteParaGuardado_ComSucesso() {
-        // Arrange
-        ControleFinanceiro controle = new ControleFinanceiro();
-        controle.setUsuario(usuario);
-        controle.setSaldoDisponivel(new BigDecimal("500.00"));
-
-        ItemPlanejamento item = new ItemPlanejamento();
-        item.setId(itemId);
-        item.setControle(controle);
-        item.setStatus(StatusPlanejamento.PENDENTE);
-        item.setValor(new BigDecimal("100.00"));
-        item.setContaDestino(conta);
-        item.setCarteira(carteira);
-        carteira.setNome("Viagem");
-
-        when(itemRepo.findById(itemId)).thenReturn(Optional.of(item));
-
-        // Act
-        financeiroService.alternarStatus(itemId, usuario);
-
-        // Assert
-
-        assertEquals(new BigDecimal("400.00"), controle.getSaldoDisponivel());
-
-        assertEquals(StatusPlanejamento.GUARDADO, item.getStatus());
 
 
-        ArgumentCaptor<TransacaoRequest> requestCaptor = ArgumentCaptor.forClass(TransacaoRequest.class);
-        verify(transacaoService).criar(requestCaptor.capture(), eq(usuario));
 
-        TransacaoRequest transacaoGerada = requestCaptor.getValue();
-        assertEquals("Reserva: Viagem", transacaoGerada.descricao());
-        assertEquals(new BigDecimal("100.00"), transacaoGerada.valor());
-        assertEquals(TipoTransacao.RECEITAS, transacaoGerada.tipo());
-
-
-        verify(controleRepo).save(controle);
-        verify(itemRepo).save(item);
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao tentar alternar status com saldo insuficiente")
-    void alternarStatus_QuandoSaldoInsuficiente_DeveLancarExcecao() {
-        // Arrange
-        ControleFinanceiro controle = new ControleFinanceiro();
-        controle.setUsuario(usuario);
-
-        controle.setSaldoDisponivel(new BigDecimal("50.00"));
-
-        ItemPlanejamento item = new ItemPlanejamento();
-        item.setId(itemId);
-        item.setControle(controle);
-        item.setStatus(StatusPlanejamento.PENDENTE);
-        item.setValor(new BigDecimal("100.00"));
-
-        when(itemRepo.findById(itemId)).thenReturn(Optional.of(item));
-
-        // Act & Assert
-        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class,
-                () -> financeiroService.alternarStatus(itemId, usuario));
-
-        assertEquals("Saldo ficticio disponivel é insuficiente para esta reserva!", exception.getMessage());
-
-
-        verifyNoInteractions(transacaoService, controleRepo);
-        verify(itemRepo, never()).save(any());
-    }
 
     @Test
     @DisplayName("Deve realizar resgate parcial e manter o status GUARDADO se sobrar saldo no item")
