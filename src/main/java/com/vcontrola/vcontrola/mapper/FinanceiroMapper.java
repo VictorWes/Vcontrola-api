@@ -35,7 +35,8 @@ public class FinanceiroMapper {
                 entity.getValor(),
                 entity.getStatus(),
                 entity.getContaDestino().getNome(),
-                entity.getContaDestino().getId()
+                entity.getContaDestino().getId(),
+                entity.getValorGuardado()
         );
     }
 
