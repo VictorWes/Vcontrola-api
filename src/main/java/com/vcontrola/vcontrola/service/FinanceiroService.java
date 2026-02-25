@@ -67,24 +67,51 @@ public class FinanceiroService {
     @Transactional
     public void atualizarItem(UUID id, ItemPlanejamentoRequest dados, Usuario usuario) {
         ItemPlanejamento item = itemRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+                .orElseThrow(() -> new RegraDeNegocioException("Item não encontrado"));
 
-        if (!item.getControle().getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("Acesso negado");
+        ControleFinanceiro controle = item.getControle();
+
+        if (!controle.getUsuario().getId().equals(usuario.getId())) {
+            throw new RegraDeNegocioException("Acesso negado");
         }
+
+        Conta novaConta = contaRepo.findById(dados.contaDestinoId())
+                .orElseThrow(() -> new RegraDeNegocioException("Conta destino não encontrada"));
+
+        TipoContaUsuario novaCarteira = tipoContaUsuarioRepo.findById(dados.carteiraId())
+                .orElseThrow(() -> new RegraDeNegocioException("Carteira não encontrada"));
 
 
         if (item.getStatus() == StatusPlanejamento.GUARDADO) {
-            throw new RuntimeException("Desbloqueie o item (cadeado) antes de editar.");
+
+
+            BigDecimal diferenca = dados.valor().subtract(item.getValor());
+
+            if (diferenca.compareTo(BigDecimal.ZERO) > 0) {
+                if (controle.getSaldoDisponivel().compareTo(diferenca) < 0) {
+                    throw new RegraDeNegocioException("Saldo disponível insuficiente para adicionar este valor extra!");
+                }
+
+                controle.setSaldoDisponivel(controle.getSaldoDisponivel().subtract(diferenca));
+                controleRepo.save(controle);
+
+
+                TransacaoRequest depositoExtra = new TransacaoRequest(
+                        "Aporte Extra: " + novaCarteira.getNome(),
+                        diferenca,
+                        TipoTransacao.RECEITAS, // Dinheiro guardado = Receita
+                        StatusTransacaoCartao.PAGO,
+                        LocalDate.now(),
+                        novaConta.getId(),
+                        null, null
+                );
+                transacaoService.criar(depositoExtra, usuario);
+
+            } else if (diferenca.compareTo(BigDecimal.ZERO) < 0) {
+
+                throw new RegraDeNegocioException("Para reduzir o valor de uma reserva, utilize a opção de 'Resgate' ou desbloqueie o item.");
+            }
         }
-
-
-        Conta novaConta = contaRepo.findById(dados.contaDestinoId())
-                .orElseThrow(() -> new RuntimeException("Conta destino não encontrada"));
-
-        TipoContaUsuario novaCarteira = tipoContaUsuarioRepo.findById(dados.carteiraId())
-                .orElseThrow(() -> new RuntimeException("Carteira não encontrada"));
-
         item.setValor(dados.valor());
         item.setContaDestino(novaConta);
         item.setCarteira(novaCarteira);
@@ -110,7 +137,7 @@ public class FinanceiroService {
     }
 
     @Transactional
-    public void alternarStatus(UUID itemId, Usuario usuario) {
+    public void guardarParcial(UUID itemId, BigDecimal valorParaGuardar, Usuario usuario) {
         ItemPlanejamento item = itemRepo.findById(itemId)
                 .orElseThrow(() -> new RegraDeNegocioException("Item não encontrado"));
 
@@ -119,43 +146,35 @@ public class FinanceiroService {
         if (!controle.getUsuario().getId().equals(usuario.getId())) {
             throw new RegraDeNegocioException("Acesso negado");
         }
+        if (valorParaGuardar.compareTo(item.getValor()) > 0) {
+            throw new RegraDeNegocioException("O valor a guardar não pode ser maior que o planejado.");
+        }
 
-        if (item.getStatus() == StatusPlanejamento.PENDENTE) {
+        if (controle.getSaldoDisponivel().compareTo(valorParaGuardar) < 0) {
+            throw new RegraDeNegocioException("Saldo disponível insuficiente para guardar este valor.");
+        }
 
-            if (controle.getSaldoDisponivel().compareTo(item.getValor()) < 0) {
-                throw new RegraDeNegocioException("Saldo ficticio disponivel é insuficiente para esta reserva!");
-            }
+        controle.setSaldoDisponivel(controle.getSaldoDisponivel().subtract(valorParaGuardar));
+        item.setValor(item.getValor().subtract(valorParaGuardar));
 
-            controle.setSaldoDisponivel(controle.getSaldoDisponivel().subtract(item.getValor()));
+        if (item.getValorGuardado() == null) {
+            item.setValorGuardado(BigDecimal.ZERO);
+        }
+        item.setValorGuardado(item.getValorGuardado().add(valorParaGuardar));
 
-            TransacaoRequest deposito = new TransacaoRequest(
-                    "Reserva: " + item.getCarteira().getNome(),
-                    item.getValor(),
-                    TipoTransacao.RECEITAS,
-                    StatusTransacaoCartao.PAGO,
-                    LocalDate.now(),
-                    item.getContaDestino().getId(),
-                    null, null
-            );
-            transacaoService.criar(deposito, usuario);
-
+        TransacaoRequest deposito = new TransacaoRequest(
+                "Reserva: " + item.getCarteira().getNome(),
+                valorParaGuardar,
+                TipoTransacao.RECEITAS,
+                StatusTransacaoCartao.PAGO,
+                LocalDate.now(),
+                item.getContaDestino().getId(),
+                null, null
+        );
+        transacaoService.criar(deposito, usuario);
+        if (item.getValor().compareTo(BigDecimal.ZERO) == 0) {
             item.setStatus(StatusPlanejamento.GUARDADO);
-
         } else {
-
-            controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(item.getValor()));
-
-            TransacaoRequest saque = new TransacaoRequest(
-                    "Estorno Reserva: " + item.getCarteira().getNome(),
-                    item.getValor(),
-                    TipoTransacao.GASTOS,
-                    StatusTransacaoCartao.PAGO,
-                    LocalDate.now(),
-                    item.getContaDestino().getId(),
-                    null, null
-            );
-            transacaoService.criar(saque, usuario);
-
             item.setStatus(StatusPlanejamento.PENDENTE);
         }
 
@@ -176,22 +195,27 @@ public class FinanceiroService {
     @Transactional
     public void resgatarParcial(UUID itemId, BigDecimal valorResgate, Usuario usuario) {
         ItemPlanejamento item = itemRepo.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+                .orElseThrow(() -> new RegraDeNegocioException("Item não encontrado"));
 
         if (!item.getControle().getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("Acesso negado");
+            throw new RegraDeNegocioException("Acesso negado");
         }
 
-        if (item.getStatus() != StatusPlanejamento.GUARDADO) {
-            throw new RuntimeException("Apenas itens guardados podem ter resgate parcial.");
+
+        if (item.getValorGuardado() == null) {
+            item.setValorGuardado(BigDecimal.ZERO);
         }
 
-        if (valorResgate.compareTo(item.getValor()) > 0) {
-            throw new RuntimeException("O valor do resgate não pode ser maior que o valor guardado.");
+        if (valorResgate.compareTo(item.getValorGuardado()) > 0) {
+            throw new RegraDeNegocioException("O valor do resgate não pode ser maior que o valor já guardado.");
         }
 
-        item.setValor(item.getValor().subtract(valorResgate));
+        ControleFinanceiro controle = item.getControle();
 
+
+        controle.setSaldoDisponivel(controle.getSaldoDisponivel().add(valorResgate));
+        item.setValorGuardado(item.getValorGuardado().subtract(valorResgate));
+        item.setValor(item.getValor().add(valorResgate));
         TransacaoRequest saque = new TransacaoRequest(
                 "Resgate Parcial: " + item.getCarteira().getNome(),
                 valorResgate,
@@ -202,13 +226,9 @@ public class FinanceiroService {
                 null, null
         );
         transacaoService.criar(saque, usuario);
+        item.setStatus(StatusPlanejamento.PENDENTE);
 
-
-        if (item.getValor().compareTo(BigDecimal.ZERO) == 0) {
-            item.setStatus(StatusPlanejamento.PENDENTE);
-        }
-
+        controleRepo.save(controle);
         itemRepo.save(item);
-
     }
 }
