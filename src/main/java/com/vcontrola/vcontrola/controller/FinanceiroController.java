@@ -3,6 +3,7 @@ package com.vcontrola.vcontrola.controller;
 import com.vcontrola.vcontrola.controller.request.ItemPlanejamentoRequest;
 import com.vcontrola.vcontrola.controller.request.ResgateRequest;
 import com.vcontrola.vcontrola.controller.request.SaldoVirtualRequest;
+import com.vcontrola.vcontrola.controller.request.ValorRequest;
 import com.vcontrola.vcontrola.controller.response.ResumoFinanceiroResponse;
 import com.vcontrola.vcontrola.entity.Usuario;
 import com.vcontrola.vcontrola.service.FinanceiroService;
@@ -59,10 +60,16 @@ public class FinanceiroController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/item/{id}/alternar")
-    public ResponseEntity<Void> alternarStatus(@PathVariable UUID id, Authentication auth) {
+    @PatchMapping("/item/{id}/guardar")
+    public ResponseEntity<Void> guardarParcial(
+            @PathVariable UUID id,
+            @Valid @RequestBody ValorRequest request,
+            Authentication auth) {
+
         Usuario usuario = (Usuario) auth.getPrincipal();
-        service.alternarStatus(id, usuario);
+
+        service.guardarParcial(id, request.valor(), usuario);
+
         return ResponseEntity.ok().build();
     }
 
