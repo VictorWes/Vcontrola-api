@@ -91,7 +91,6 @@ public class UsuarioController {
 
     @PostMapping("/conta/recuperar-senha")
     public ResponseEntity<Void> recuperarSenha(@RequestBody @Valid EsqueciSenhaRequest request) {
-        // Passa apenas o e-mail extraído do DTO encapsulado
         usuarioService.recuperarSenha(request.email());
 
         return ResponseEntity.noContent().build();
@@ -99,7 +98,6 @@ public class UsuarioController {
 
     @PostMapping("/conta/redefinir-senha")
     public ResponseEntity<Void> redefinirSenha(@RequestBody @Valid DefinirNovaSenhaRequest request) {
-        // Chama o service passando o token e a nova senha
         usuarioService.redefinirSenha(request.token(), request.novaSenha());
 
         return ResponseEntity.noContent().build();

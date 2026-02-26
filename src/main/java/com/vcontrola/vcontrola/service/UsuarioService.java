@@ -81,7 +81,6 @@ public class UsuarioService {
         } catch (Exception e) {
             System.err.println("Falha ao enviar e-mail de boas-vindas: " + e.getMessage());
         }
-        // 👆 FIM DO BLOCO DE E-MAIL 👆
 
         return usuarioMapper.toResponse(usuarioSalvo);
     }

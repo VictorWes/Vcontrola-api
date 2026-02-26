@@ -40,13 +40,11 @@ public class Transacao {
     private LocalDate data;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cartao_credito_id") // Pode ser nulo se for gasto em conta
+    @JoinColumn(name = "cartao_credito_id")
     private CartaoCredito cartaoCredito;
 
-    // O "RG" de família: UUID gerado no Service para agrupar parcelas
-    private UUID transactionGroupId;
 
-    // Ex: "1/10", "2/10"
+    private UUID transactionGroupId;
     private String numeroParcela;
 
 

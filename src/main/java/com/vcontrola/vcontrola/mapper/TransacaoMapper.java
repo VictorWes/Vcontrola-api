@@ -57,7 +57,7 @@ public class TransacaoMapper {
                 entity.getStatus(),
                 entity.getData(),
                 entity.getConta().getId(),
-                entity.getConta().getNome(), // Aqui pegamos o nome da conta para facilitar o Front
+                entity.getConta().getNome(),
                 entity.getNumeroParcela()
         );
     }

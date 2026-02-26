@@ -27,12 +27,12 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Adicionamos um TRY-CATCH para blindar o filtro
+
         try {
             var token = this.recoverToken(request);
 
             if (token != null) {
-                var login = tokenService.getSubject(token); // Se der erro aqui, cai no catch
+                var login = tokenService.getSubject(token);
 
                 if (login != null && !login.isEmpty()) {
                     var usuario = repository.findByEmail(login).orElse(null);
@@ -44,11 +44,8 @@ public class SecurityFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Logamos o erro para você ver no console, mas NÃO paramos a requisição
             System.out.println("Erro na validação do Token: " + e.getMessage());
         }
-
-        // O filtro continua, permitindo que o Spring Security decida o que fazer
         filterChain.doFilter(request, response);
     }
 

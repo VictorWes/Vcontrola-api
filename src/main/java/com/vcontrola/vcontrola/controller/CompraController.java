@@ -42,7 +42,7 @@ public class CompraController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
             @PathVariable UUID id,
-            @RequestParam(required = false) UUID contaId) { // <--- Conta para onde o dinheiro volta
+            @RequestParam(required = false) UUID contaId) {
 
         service.excluir(id, contaId);
         return ResponseEntity.noContent().build();

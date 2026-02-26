@@ -42,7 +42,7 @@ public class TipoContaService {
         TipoContaUsuario carteira = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Carteira não encontrada"));
 
-        // Segurança: Verifica se a carteira é do usuário logado
+
         if (!carteira.getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("Acesso negado.");
         }

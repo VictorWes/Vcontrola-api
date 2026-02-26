@@ -47,7 +47,6 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                        // Rotas Privadas (O usuário TEM que estar logado)
                         .requestMatchers("/cartoes", "/cartoes/**").authenticated() //
                         .requestMatchers("/compras", "/compras/**").authenticated()
                         .requestMatchers("/parcelas", "/parcelas/**").authenticated()
@@ -55,7 +54,7 @@ public class SecurityConfigurations {
                         .requestMatchers("/planejamento", "/planejamento/**").authenticated()
 
 
-                        // Qualquer outra coisa precisa de login
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
